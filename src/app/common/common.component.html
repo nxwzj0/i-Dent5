@@ -1,0 +1,25 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：共通画面
+//	作成日付・作成者：2018.01.25 ADF)S.Yoshida
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+<my-header></my-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 h2">
+    {{msg}}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 h2">
+    <button type="button" class="btn btn-danger" routerLink="{{nextUrl}}" routerLinkActive="current" [routerLinkActiveOptions]="{ exact: true }"
+      *ngIf="btnShowFlg">
+      次へ
+    </button>
+  </div>
+</div>

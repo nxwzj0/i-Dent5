@@ -1,0 +1,133 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：機場モーダル部品
+//	作成日付・作成者：2017.12.08 ADF)S.Yoshida
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+
+<div bsModal #template="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h4 class="modal-title pull-left">
+          <strong>機場の検索</strong>
+        </h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="template.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transition-button text-right">
+              <!--<button type="button" class="btn btn-danger btn-mini">-->
+              <button type="button" (click)="clearKijoSearch()" class="btn btn-danger btn-mini">
+                リセット
+              </button>
+              <button type="button" class="btn btn-danger btn-mini">
+                <i class="fa fa-search"></i> 検索
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  都道府県
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <!--<input type="text" class="form-control">-->
+              <input name="searchPrefNm" type="text" class="form-control" [(ngModel)]="searchPrefNm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  事業主体
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <!--<input type="text" class="form-control">-->
+              <input name="searchProjectNm" type="text" class="form-control" [(ngModel)]="searchProjectNm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  機場
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <!--<input type="text" class="form-control">-->
+              <input name="searchKijoNm" type="text" class="form-control" [(ngModel)]="searchKijoNm">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 search-result-info">
+              検索結果：　100件
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
+              <pagination name="paging1" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
+                class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;"></pagination>
+            </div>
+            <div class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-4">
+              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage"> 件/頁
+            </div>
+          </div>
+
+          <div class="row" id="search-list">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="panel">
+                <table class="table table-striped list-table">
+                  <thead>
+                    <tr>
+                      <th class="table-header-list"></th>
+                      <th class="table-header-list">都道府県</th>
+                      <th class="table-header-list">事業主体</th>
+                      <th class="table-header-list">機場</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let data of incidentList">
+                      <td class="code-list">
+                        <button type="button" class="btn btn-danger btn-mini">
+                          選択
+                        </button>
+                      </td>
+                      <td class="char-list">{{data.prefNm}}</td>
+                      <td class="char-list"></td>
+                      <td class="char-list">{{data.kijoNm}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
+              <pagination name="paging2" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
+                class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;"></pagination>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

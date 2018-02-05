@@ -1,0 +1,109 @@
+/* ボタン */
+.btn-mini {
+    height: 24px;
+    /* width: 22px; */
+    padding: 0px 2px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 保存ボタン */
+.save-button {
+    margin: 5px 0px;
+}
+
+/* モーダルタイトル幅の調整 */
+.modal-header{
+    padding: 10px;
+    border-radius: 6px 6px 0px 0px;
+}
+
+.modal-body {
+    background-color: #f8f8f8;
+    border-radius: 0px 0px 6px 6px;
+}
+
+/* 検索項目：項目名 */
+.input-label {
+    height: 22px;
+    border-radius: 4px;
+    border: 1px solid wheat;
+    margin-bottom: 10px;
+}
+
+/* チェックボックスのマージンを除き、ラベルの高さを合わせる */
+.checkbox {
+    margin: 0px;
+}
+
+/* 検索一覧画面テーブルのヘッダ */
+.table-header-list {
+    text-align: center;
+}
+
+/* 検索項目：チェックボックスのレイアウト調整 */
+.input-item {
+    margin-right: 10px;
+}
+
+/* 検索項目の余計な余白を削る */
+.label-padding {
+    padding-right: 0px;
+}
+
+/* 検索一覧画面　日付input */
+.date-div {
+    width: 105px;
+    float: left;
+    position: relative;
+}
+
+/* 検索一覧画面　要素間の文字(～) */
+.inner-text {
+    font-size: 16px; 
+    float:left;
+    margin: 0px 5px;
+}
+
+/* テーブル 中央揃え */
+.list-table>thead>tr>th{
+    vertical-align: middle;
+}
+
+/* テーブル 中央揃え */
+.list-table>tbody>tr>td{
+    vertical-align: middle;
+}
+
+/* インシデント番号のヘッダー幅*/
+.incident-no-th {
+    width:102px;
+}
+
+/* 共通モーダルのボタングループ */
+.common-btn-group {
+    text-align: center;
+}
+
+/* 共通モーダルのボタン */
+.common-btn {
+    text-align: center;
+    width: 100px;
+}
+
+/* 共通モーダルのメッセージ */
+.common-mes {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+/* 共通モーダル 処理ボタン表示 */
+.common-enter-btn-show {
+    display: inline;    
+}
+
+/* 共通モーダル 処理ボタン非表示 */
+.common-enter-btn-hide {
+    display: none;    
+}

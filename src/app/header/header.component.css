@@ -1,0 +1,77 @@
+/* システムタイトル部 */
+.system-title {
+    font-weight: bold;
+}
+
+/* タイトル・ユーザ名表示 */
+.header-user-name {
+    margin-right:10px;
+}
+
+/* タイトル・メニュー選択時 */
+.nav .open>a, .nav .open>a:focus, .nav .open>a:hover a:focus, a:hover {
+    color: #23527c;
+}
+
+/* ヘッダー右寄せ部のレイアウト調整 */
+.navbar-right {
+    margin-right: 15px;
+}
+
+/* ヘッダーメニュー項目のレイアウト調整 */
+.navbar-nav>li>a {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+/* ヘッダー1段目(背景赤系色) */
+/* colorの値・・・bootstrapに負けてる？ */
+.header-first {
+    background-color: firebrick;
+    color: #ffffff;
+}
+
+/* ヘッダー2段目(背景橙系色) */
+/* colorの値・・・bootstrapに負けてる？ */
+.header-second {
+    background-color: darkorange;
+    color: #ffffff;
+}
+
+/* ヘッダーのテキスト */
+.header-text {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+/* paddingを上書き、ヘッダータイトルの位置を調整*/
+.navbar-brand {
+    padding: 10px 10px 10px 10px;
+}
+
+/*ヘッダーのユーザー名*/
+.header-user-area-text {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    color: #ffffff;
+}
+
+
+/* ヘッダーの検索欄のレイアウト調整 */
+.header-search {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+/* ヘッダー部読み込み時のheight値 */
+.header-frame {
+/*    position: relative !important;
+    z-index: 100 !important;*/
+    height: 86px;
+}
+
+/* ヘッダー部 プルダウンをマウスオーバーで表示 */
+.dropdown:hover > .dropdown-menu{
+    display: block;
+}

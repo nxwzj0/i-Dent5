@@ -1,0 +1,177 @@
+/* You can add global styles to this file, and also import other style files */
+
+body {
+    background-color: #f8f8f8;
+}
+
+/* 一覧表示：番号、コード項目 */
+.code-list {
+    text-align: center;
+}
+
+/* 一覧表示：文字項目 */
+.char-list {
+    text-align: left;
+}
+
+/* 一覧表示：分類、ステータス項目 */
+.status-list {
+    text-align: center;
+}
+
+/* テーブル内：日付項目 */
+.date-list {
+    text-align: center;
+}
+
+/* 一覧表示：検索結果表示 */
+.search-result-info {
+    padding-top: 10px;
+}
+
+/* loading*/
+.entryLoad {       
+    background: #000;
+    filter: alpha(opacity=50);
+    opacity: 0.5;
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    display:none;
+}  
+
+/* 入力項目選択用ボタン */
+.btn-input-support {
+    height: 22px;
+    width: 22px;
+    padding: 0px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* heightを上書き、細めの入力欄とする */
+.form-control {
+    height: 22px;
+    padding: 0px 5px;
+}
+
+/* 画面遷移系ボタン */
+.transition-button {
+    margin-bottom: 15px;
+}
+
+/* 項目部のマージン */
+.context-margin {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+/* 青テキスト青下線(パネルヘッダ) */
+.panel-header {
+    margin-top: 20px;
+    margin-bottom: 0px;
+    border-bottom: 2px solid #337ab7;
+}
+
+/* 青テキスト青下線(項目部) */
+.context-header {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #337ab7;
+}
+
+/* 青テキスト青下線(項目部)表示レベルが1段階下 */
+.context-sub-header {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #337ab7;
+}
+
+/* 閲覧：内容等の背景(灰色) */
+.info-detail-area {
+    background-color: whitesmoke;
+    margin-top: 5px;
+}
+
+/* 設備情報及び顧客情報 */
+.setubi-and-cust-info-border {
+    padding: 0px 10px;
+    border-left: 20px solid lightpink;
+}
+
+/* 受付情報 */
+.call-info-border {
+    padding: 0px 10px;
+    border-left: 20px solid lightblue;
+}
+
+/* 対応情報 */
+.taio-info-border {
+    padding: 0px 10px;
+    border-left: 20px solid lightgreen;
+}
+
+/* 処置情報 */
+.action-info-border {
+    padding: 0px 10px;
+    /*border-left: 20px solid lightyellow;*/
+    border-left: 20px solid yellow;
+}
+
+/* 製品情報 */
+.product-info-border {
+    padding: 0px 10px;
+    border-left: 20px solid mediumorchid;
+}
+
+/* 関係者情報 */
+.relate-user-info-border {
+    padding: 0px 10px;
+    border-left: 20px solid #d3d3d3;
+}
+
+/* 調査情報 */
+.research-info-border {
+    padding: 0px 10px;
+    border-left: 20px solid #337ab7;
+}
+
+/* 関係者追加リンク */
+.relate-user-add-link{
+    margin-left: 10px;
+}
+
+/* 関係者名 */
+.relate-user-nm{
+    margin-left: 20px;
+}
+
+/* ページング部品　件/頁の入力欄 */
+.itemsPerPage {
+    width: 35px;
+    margin: 0px;
+}
+
+/* ページング部品　ページ表示調整 */
+.pagination{
+    margin: 0px;
+}
+
+/* サブウインドウのコンテンツ始め */
+.sub-win-content-start {
+    margin-bottom: 5px;
+}
+
+/* 必須入力 */
+.require {
+    color: red;
+}
+
+/* 入力チェックエラー */
+input.ng-dirty.ng-invalid { 
+    background-color: #fee; 
+}

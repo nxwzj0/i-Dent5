@@ -1,0 +1,514 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：インシデントMr2画面
+//	作成日付・作成者：2017.12.08 ADF)S.Yoshida
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+<loading [loading]="isLoading"></loading>
+<div>
+    <div class="container-fluid">
+        <div class="sub-win-content-start"></div>
+        <div class="text-right transition-button">
+            <span>
+                <button type="button" class="btn" (click)="nativeWindow.close();">
+                    閉じる
+                </button>
+            </span>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="panel panel-info">
+                    <div class="panel-heading clearfix">
+                        <span class="h3 incident-title-status">障害対応報告書(MR2)</span>
+                        <div class="pull-right">
+                            <strong>最終更新日：{{updDateDsp | datex:'YYYY/MM/DD HH:mm'}} {{updUserNmDsp}}</strong>
+                        </div>
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body context-margin">
+                        <h5 class="context-header">
+                            <strong>基本情報</strong>
+                        </h5>
+                        <div class="setubi-and-cust-info-border">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>受付番号：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{incidentNo}}</div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>出動回数：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{actionCnt}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>PJ番号：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{PjId}}</div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>顧客名：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{custNm}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>機場：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{kijoNm}}</div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>作成日：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{makeDate | datex:'YYYY/MM/DD HH:mm'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>受付日：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{callDate | datex:'YYYY/MM/DDHH:mm'}}</div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>障害発生日：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{startDate | datex:'YYYY/MM/DD HH:mm'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>処理担当部署：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{actSectionNm}}</div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>検査責任部署：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{checkSectionNm}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>検査責任者：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{checkUserNm}}</div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>御依頼元担当部署：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{requestSectionNm}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>御依頼元担当者：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{requestUserNm}}</div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>作業担当者：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{workUserNm}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>発行部署：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{issSectionNm}}</div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>MR2状況：</strong>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{mr2StsNm}}</div>
+                            </div>
+                        </div>
+                        <h5 class="context-header">
+                            <strong>行動記録</strong>
+                        </h5>
+                        <div class="call-info-border">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>出発日：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{goDate | datex:'YYYY/MM/DD HH:mm'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>到着日：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{arrivalDate | datex:'YYYY/MM/DD HH:mm'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>作業開始日：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{workStartDate | datex:'YYYY/MM/DD HH:mm'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>作業終了日：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{workEndDate | datex:'YYYY/MM/DD HH:mm'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>現地出発日：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{retuenDate | datex:'YYYY/MM/DD HH:mm'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>帰着日：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{arrivalBackDate | datex:'YYYY/MM/DD HH:mm'}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+
+                <h4 class="panel-header text-primary">
+                    <strong>▼作業情報</strong>
+                </h4>
+                <div class="panel panel-default">
+                    <div class="panel-body context-margin">
+
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>件名：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{subjectNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>設備名：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{setubiNm}}</div>
+                        </div>
+                        <h5 class="context-sub-header">
+                            <strong>不具合状況</strong>
+                        </h5>
+                        <div class="setubi-and-cust-info-border">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>トリガー：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{triggerDsp}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>頻度：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{hindoDsp}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>現象：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{gensyoDsp}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>状態：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{jyotaiDsp}}</div>
+                            </div>
+                            <div class="info-detail-area">
+                                {{defectComment}}
+                            </div>
+                        </div>
+                        <h5 class="context-sub-header">
+                            <strong>設備影響</strong>
+                        </h5>
+                        <div class="call-info-border">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>設備停止：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{setubiStop}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>データ欠損：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{dataDefect}}</div>
+                            </div>
+                            <div class="info-detail-area">
+                                {{setubiComment}}
+                            </div>
+                        </div>
+                        <h5 class="context-sub-header">
+                            <strong>調査内容</strong>
+                        </h5>
+                        <div class="taio-info-border">
+                            <div class="info-detail-area">
+                                {{researchComment}}
+                            </div>
+                        </div>
+                        <h5 class="context-sub-header">
+                            <strong>原因</strong>
+                        </h5>
+                        <div class="action-info-border">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>原因特定：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{genin}}</div>
+                            </div>
+                            <div class="info-detail-area">
+                                {{geninComment}}
+                            </div>
+                        </div>
+                        <h5 class="context-sub-header">
+                            <strong>処置</strong>
+                        </h5>
+                        <div class="product-info-border">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>処置方法：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{actSyotiNm}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>顧客要望：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{actSyotiYoboDsp}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>対策期限：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{actionTaisakuDt | date:'yyyy/MM/dd'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>コメント：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{actionSonotaComm}}</div>
+                            </div>
+
+                            <div class="info-detail-area">
+                                {{actComment}}
+                            </div>
+                        </div>
+                        <h5 class="context-header">
+                            <strong>結果</strong>
+                        </h5>
+                        <div class="relate-user-info-border">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                    <strong>復旧状況：</strong>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{kekka}}</div>
+                            </div>
+                            <div class="info-detail-area">
+                                {{kekkaComment}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>対象機器名称：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{taisyoKikiNm}}</div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>盤名称・記号：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{banMeiKigou}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>物品処理：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{goodsSyoriNm}}</div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>設置場所：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{setPlaceNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>部品払出：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{goodsPayNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>払出日：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{payDate | date:'yyyy/MM/dd'}}</div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>返却日：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{repayDate | date:'yyyy/MM/dd'}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>伝票番号：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{slipNo}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>最終検査：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{finalCheckPassNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>最終検査内容：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{finalCheckDetNm}}</div>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+
+                <h4 class="panel-header text-primary">
+                    <strong>▼お客様入力欄</strong>
+                </h4>
+                <div class="panel panel-default">
+                    <div class="panel-body context-margin">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>今回の作業について：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{thisTimeWorkNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>お客様コメント：</strong>
+                            </div>
+                            <div *ngIf="custComment.length > 0" class="col-lg-9 col-md-9 col-sm-6 col-xs-6 info-detail-area">{{custComment}}</div>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+
+                <h4 class="panel-header text-primary">
+                    <strong>▼社内向け入力欄</strong>
+                </h4>
+                <div class="panel panel-default">
+                    <div class="panel-body context-margin">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>対象機種区分：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{supSotiSortNm}} {{supKisyuKbnNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>製作メーカ：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{seisakuMaker}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>施工メーカ：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{sekouMaker}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>保守契約：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{hosyuKeiyakuUmuNm}}</div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>保守契約(種類)：</strong>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{hosyuKeiyakuNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>確認方法：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{kakuninMethNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>障害ランク：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{failureRankNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>原因分類：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{geninSortDsp}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>社外公開：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{koukaiNm}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>社内向け連絡事項・補足・備考欄：</strong>
+                            </div>
+                            <div *ngIf="syanaiMessage.length > 0" class="col-lg-9 col-md-9 col-sm-6 col-xs-6 info-detail-area">{{syanaiMessage}}</div>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+
+                <h4 class="panel-header text-primary">
+                    <strong>▼改善情報</strong>
+                </h4>
+                <div class="panel panel-default">
+                    <div class="panel-body context-margin">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>改善情報：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{kaizen}}</div>
+                        </div>
+
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+
+
+                <h4 class="panel-header text-primary">
+                    <strong>▼対象CAN</strong>
+                </h4>
+                <div class="panel panel-default">
+                    <div class="panel-body context-margin">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>対象CAN1：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{targetCan1}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>対象CAN2：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{targetCan2}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>対象CAN3：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{targetCan3}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>対象CAN4：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{targetCan4}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                <strong>対象CAN5：</strong>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{targetCan5}}</div>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+</div>

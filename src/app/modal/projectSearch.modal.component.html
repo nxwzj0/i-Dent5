@@ -1,0 +1,144 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：機場モーダル部品
+//	作成日付・作成者：2017.12.22 ADF)Takafumi.Sato
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+<loading [loading]="isLoading"></loading>
+<div bsModal #template="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h4 class="modal-title pull-left">
+          <strong>プロジェクトの検索</strong>
+        </h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="template.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transition-button text-right">
+              <button type="button" class="btn btn-danger btn-mini" (click)="clearProjectSearch()">
+                リセット
+              </button>
+              <button type="button" class="btn btn-danger btn-mini" (click)="search()">
+                <i class="fa fa-search"></i> 検索
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  PJ番号
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchPjNo" type="text" class="form-control" [(ngModel)]="searchPjNo">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  INQ番号
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchInqNo" type="text" class="form-control" [(ngModel)]="searchInqNo">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  最終需要家
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchConsumerNm" type="text" class="form-control" [(ngModel)]="searchConsumerNm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  総括品
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchSummaryNm" type="text" class="form-control" [(ngModel)]="searchSummaryNm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 search-result-info">
+              検索結果：　{{bigTotalItems}}件
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
+              <pagination name="paging1" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
+                [itemsPerPage]="itemsPerPage" class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;"
+                firstText="&laquo;" lastText="&raquo;" (click)="pageChanged($event)"></pagination>
+            </div>
+            <div class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-4">
+              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged()"> 件/頁
+            </div>
+          </div>
+
+          <div class="row" id="search-list">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="panel">
+                <table class="table table-striped list-table">
+                  <thead>
+                    <tr>
+                      <th class="table-header-list"></th>
+                      <th class="table-header-list">PJ番号</th>
+                      <th class="table-header-list">INQ番号</th>
+                      <th class="table-header-list">最終需要家</th>
+                      <th class="table-header-list">総括品</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let data of projList | slice: start: end">
+                      <td class="code-list">
+                        <button type="button" class="btn btn-danger btn-mini" (click)="onSelect(data?.pjId, data?.pjNo,data?.summaryNm)">
+                          選択
+                        </button>
+                      </td>
+                      <td class="char-list">{{data.pjNo}}</td>
+                      <td class="char-list">{{data.inqNo}}</td>
+                      <td class="char-list">{{data.consumerNm}}</td>
+                      <td class="char-list">{{data.summaryNm}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
+              <pagination name="paging2" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
+                [itemsPerPage]="itemsPerPage" class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;"
+                firstText="&laquo;" lastText="&raquo;" (click)="pageChanged($event)"></pagination>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

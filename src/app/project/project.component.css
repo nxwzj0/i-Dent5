@@ -1,0 +1,36 @@
+/* トップ画面テーブルのヘッダ(オレンジ色) */
+.table-header {
+    text-align: center;
+    background-color: moccasin;
+}
+
+/* パネルのタイトルをインライン表示 */
+.top-panel-title {
+    display: inline;
+}
+
+/* テーブル　固定幅適用　文字列折り返し適用 */
+.list-table {
+    table-layout:fixed;
+    word-wrap: break-word;
+}
+
+/* テーブル 中央揃え */
+.list-table>thead>tr>th{
+    vertical-align: middle;
+}
+
+/* テーブル 中央揃え */
+.list-table>tbody>tr>td{
+    vertical-align: middle;
+}
+
+/* インシデント番号のヘッダー幅*/
+.incident-no-th {
+    width:102px;
+}
+
+/* 関連情報有無のヘッダー幅*/
+.relate-th {
+    width:44px;
+}

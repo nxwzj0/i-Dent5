@@ -1,0 +1,221 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：インシデントモーダル部品
+//	作成日付・作成者：2018-01-18 · newtouch
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+<loading [loading]="isLoading"></loading>
+<div bsModal #template="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h4 class="modal-title pull-left">
+          <strong>インシデントの検索</strong>
+        </h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="template.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transition-button text-right">
+              <button type="button" class="btn btn-danger btn-mini" (click)="clearIncidentSearch()">
+                リセット
+              </button>
+              <button type="button" class="btn btn-danger btn-mini" (click)="search()">
+                <i class="fa fa-search"></i> 検索
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  インシデント番号
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchIncidentNo" type="text" class="form-control" [(ngModel)]="searchIncidentNo">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  受付内容
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchCallContent" type="text" class="form-control" [(ngModel)]="searchCallContent">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  受付日
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-7">
+              <div class="date-div">
+                <div class="input-group">
+                  <input id="txt_callStartDateFrom" name="txt_callStartDateFrom" type="text" class="form-control" #dpCallStartDateFrom="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
+                    [(bsValue)]="searchCallStartDateFrom">
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-input-support" (click)="dpCallStartDateFrom.toggle()">
+                      <i class="fa fa-calendar"></i>
+                    </button>
+                  </span>
+                </div>
+                <span class="text-danger" *ngIf="checkDateShowCallStartDateFrom">
+                  受付日に、日付を入力してください。
+                </span>
+              </div>
+              <span class="text-center inner-text">～</span>
+              <div class="date-div">
+                <div class="input-group">
+                  <input id="txt_callStartDateTo" name="txt_callStartDateTo" type="text" class="form-control" #dpCallStartDateTo="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
+                    [(bsValue)]="searchCallStartDateTo">
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-input-support" (click)="dpCallStartDateTo.toggle()">
+                      <i class="fa fa-calendar"></i>
+                    </button>
+                  </span>
+                </div>
+                <span class="text-danger" *ngIf="checkDateShowCallStartDateTo">
+                  受付日に、日付を入力してください。
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  インシデント分類
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-9 col-md-8 col-sm-8 col-xs-7">
+              <div class="checkbox">
+                <label class="input-item">
+                  <input name="searchIncidentTypeSyougai" type="checkbox" value="1" [(ngModel)]="searchIncidentTypeSyougai"> 障害
+                </label>
+                <label class="input-item">
+                  <input name="searchIncidentTypeJiko" type="checkbox" value="2" [(ngModel)]="searchIncidentTypeJiko"> 事故
+                </label>
+                <label class="input-item">
+                  <input name="searchIncidentTypeClaim" type="checkbox" value="3" [(ngModel)]="searchIncidentTypeClaim"> クレーム
+                </label>
+                <label class="input-item">
+                  <input name="searchIncidentTypeToiawase" type="checkbox" value="4" [(ngModel)]="searchIncidentTypeToiawase"> 問合せ
+                </label>
+                <label class="input-item">
+                  <input name="searchIncidentTypeInfo" type="checkbox" value="5" [(ngModel)]="searchIncidentTypeInfo"> 情報
+                </label>
+                <label class="input-item">
+                  <input name="searchIncidentTypeOther" type="checkbox" value="6" [(ngModel)]="searchIncidentTypeOther"> その他
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  ステータス
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-9 col-md-8 col-sm-8 col-xs-7">
+              <div class="checkbox">
+                <label class="input-item">
+                  <input name="searchIncidentStatusCall" type="checkbox" value="1" [(ngModel)]="searchIncidentStatusCall"> 受付済
+                </label>
+                <label class="input-item">
+                  <input name="searchIncidentStatusTaio" type="checkbox" value="2" [(ngModel)]="searchIncidentStatusTaio"> 対応入力済
+                </label>
+                <label class="input-item">
+                  <input name="searchIncidentStatusAct" type="checkbox" value="3" [(ngModel)]="searchIncidentStatusAct"> 処置入力済
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 search-result-info">
+              検索結果：　{{bigTotalItems}}件
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
+              <pagination name="paging1" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
+                [itemsPerPage]="itemsPerPage" class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;"
+                firstText="&laquo;" lastText="&raquo;" (click)="pageChanged($event)"></pagination>
+            </div>
+            <div class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-4">
+              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged()"> 件/頁
+            </div>
+          </div>
+
+          <div class="row" id="search-list">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="panel">
+                <table class="table table-striped list-table">
+                  <thead>
+                    <tr>
+                      <th class="table-header-list"></th>
+                      <th class="table-header-list incident-no-th">インシデント番号 </th>
+                      <th class="table-header-list" width="25%"> 受付内容</th>
+                      <th class="table-header-list">
+                        受付日
+                        <i class="fa fa-caret-down"></i>
+                      </th>
+                      <th class="table-header-list"> 分類 </th>
+                      <th class="table-header-list"> ステータス </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let data of incidentList | slice: start: end">
+                      <td class="code-list">
+                        <button type="button" class="btn btn-danger btn-mini" (click)="onSelect(data?.incidentId,data?.incidentNo)">
+                          選択
+                        </button>
+                      </td>
+                      <td class="code-list">{{data.incidentNo}}</td>
+                      <td class="char-list">{{data?.callContent | slice: 0:20 }}
+                        <span *ngIf="data?.callContent.length >= 20">…</span>
+                      </td>
+                      <td class="date-list">{{data?.callDate | datex:'YYYY/MM/DD'}}</td>
+                      <td class="status-list">{{data.incidentTypeNm}}</td>
+                      <td class="status-list">{{data.incidentStatusNm}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
+              <pagination name="paging2" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
+                [itemsPerPage]="itemsPerPage" class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;"
+                firstText="&laquo;" lastText="&raquo;" (click)="pageChanged($event)"></pagination>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

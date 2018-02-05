@@ -1,0 +1,87 @@
+/* ×ボタン */
+.btn-close {
+    height: 22px;
+    width: 22px;
+    padding: 0px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 検索項目：項目名 */
+.input-label {
+    height: 22px;
+    border-radius: 4px;
+    border: 1px solid wheat;
+    margin-bottom: 10px;
+}
+
+/* チェックボックスのマージンを除き、ラベルの高さを合わせる */
+.checkbox {
+    margin: 0px;
+}
+
+/* 検索一覧画面テーブルのヘッダ */
+.table-header-list {
+    text-align: center;
+}
+
+/* 検索項目：チェックボックスのレイアウト調整 */
+.input-item {
+    margin-right: 10px;
+}
+
+/* 検索項目の余計な余白を削る */
+.label-padding {
+    padding-right: 0px;
+}
+
+/* 検索一覧画面　ウインドウスクロール対応　固定表示の検索結果ヘッダー */
+#newTable {
+    position: fixed;
+    z-index: 1;
+    top: 0px;
+}
+
+/* 検索一覧画面　日付input */
+.date-div {
+    width: 105px;
+    float: left;
+    position: relative;
+}
+
+/* 検索一覧画面　要素間の文字(～) */
+.inner-text {
+    font-size: 16px; 
+    float:left;
+    margin: 0px 5px;
+}
+
+/* テーブル 中央揃え */
+.list-table>thead>tr>th{
+    vertical-align: middle;
+}
+
+/* テーブル 中央揃え */
+.list-table>tbody>tr>td{
+    vertical-align: middle;
+}
+
+/* インシデント番号のヘッダー幅*/
+.incident-no-th {
+    width:102px;
+}
+
+/* 関連情報有無のヘッダー幅*/
+.relate-th {
+    width:44px;
+}
+
+/* 検索条件　表示 */
+.condition-show {
+    display: inline;    
+}
+
+/* 検索条件　非表示 */
+.condition-hide {
+    display: none;    
+}

@@ -1,0 +1,60 @@
+.overlay {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 99999999;
+}
+.overlay .message {
+    text-align: center;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 200px;
+    height: 40px;
+    background: rgba(220, 220, 230, 0.8);
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    padding-top: 10px;
+}
+.overlay .message .rotate {
+    position: absolute;
+    left: 40px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: #1aa;
+    -webkit-animation: spin 1.5s linear infinite;
+    -moz-animation: spin 1.5s linear infinite;
+    -ms-animation: spin 1.5s linear infinite;
+    -o-animation: spin 1.5s linear infinite;
+    animation: spin 1.5s linear infinite;
+}
+
+@-webkit-keyframes spin {
+    0% {-webkit-transform: rotate(0deg);}
+    100% {-webkit-transform: rotate(360deg);}
+}
+@-moz-keyframes spin {
+    0% {-moz-transform: rotate(0deg);}
+    100% {-moz-transform: rotate(360deg);}
+}
+@-ms-keyframes spin {
+    0% {-ms-transform: rotate(0deg);}
+    100% {-ms-transform: rotate(360deg);}
+}
+@-o-keyframes spin {
+    0% {-o-transform: rotate(0deg);}
+    100% {-o-transform: rotate(360deg);}
+}
+@keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}

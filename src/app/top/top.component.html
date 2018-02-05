@@ -1,0 +1,73 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：インシデントTOP画面
+//	HTML_ID　　　　 ：IncidentTopView.php
+//	作成日付・作成者：2017.10.05 ADF)S.Yoshida
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+<loading [loading]="isLoading"></loading>
+<my-header></my-header>
+
+<div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="panel panel-danger">
+          <div class="panel-heading">
+            <h4 class="top-panel-title">
+              <i class="fa fa-check"></i> 最新のインシデント
+            </h4>
+          </div>
+          <table class="table table-striped list-table">
+            <thead>
+              <tr>
+                <th class="table-header incident-no-th">インシデント番号</th>
+                <th class="table-header" width="25%">受付内容</th>
+                <th class="table-header">機場</th>
+                <th class="table-header">設備</th>
+                <th class="table-header">都道府県</th>
+                <th class="table-header">発生日時</th>
+                <th class="table-header">受付日
+                  <i class="fa fa-caret-down"></i>
+                </th>
+                <th class="table-header">分類</th>
+                <th class="table-header">ステータス</th>
+                <th class="table-header relate-th" popover="関連プロジェクト" triggers="mouseenter:mouseleave">関連PJ</th>
+                <th class="table-header relate-th" popover="事故クレーム連絡" triggers="mouseenter:mouseleave">事ク連絡</th>
+                <th class="table-header relate-th" popover="現地出動（MR2）" triggers="mouseenter:mouseleave">現地出動</th>
+                <th class="table-header relate-th">費用決済</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of incidentList">
+                <td class="code-list">
+                  <a routerLink="/detail/{{data?.incidentId}}" routerLinkActive="current" [routerLinkActiveOptions]="{ exact: true }">
+                    <u>{{data?.incidentNo}}</u>
+                  </a>
+                </td>
+                <td class="char-list" popover={{data?.callContent}} triggers="mouseenter:mouseleave">
+                  {{data?.callContent | slice: 0:40 }}
+                  <span *ngIf="data?.callContent?.length >= 40" >…</span>
+                </td>
+                <td class="char-list">{{data?.kijoNm}}</td>
+                <td class="char-list">{{data?.setubiNm}}</td>
+                <td class="status-list">{{data?.prefNm}}</td>
+                <td class="date-list">{{data?.incidentStartDateTime| datex:'YYYY/MM/DD HH:mm'}}</td>
+                <td class="date-list">{{data?.callDate| datex:'YYYY/MM/DD HH:mm'}}</td>
+                <td class="status-list">{{data?.incidentTypeNm}}</td>
+                <td class="status-list">{{data?.incidentStatusNm}}</td>
+                <td class="status-list">{{data?.relatePj}}</td>
+                <td class="status-list">{{data?.relateJiko}}</td>
+                <td class="status-list">{{data?.relateMr2}}</td>
+                <td class="status-list">{{data?.relateHiyo}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

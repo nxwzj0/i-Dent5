@@ -1,0 +1,1272 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：インシデント登録画面
+//	HTML_ID　　　　 ：IncidentEditView.php
+//	作成日付・作成者：2017.10.05 ADF)S.Yoshida
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+<loading [loading]="isLoading"></loading>
+<my-header (headerEdit)="reloadEdit($event)"></my-header>
+<common-modal #common (commonEnter)="onEntry($event, iFile.files)"></common-modal>
+<common-modal #errorModal></common-modal>
+<incidentSearch-modal #incident (incidentSearchSelect)="onIncidentSearchSelected($event)"></incidentSearch-modal>
+<kijoSearch-modal #kijo></kijoSearch-modal>
+<userSearch-modal #salesUser (salesUserSelect)="onSalesUserSelected($event)"></userSearch-modal>
+<userSearch-modal #skanUser (salesUserSelect)="onSalesUserSelected($event)"></userSearch-modal>
+<userSearch-modal #callUser (salesUserSelect)="onSalesUserSelected($event)"></userSearch-modal>
+<userSearch-modal #taioUser (salesUserSelect)="onSalesUserSelected($event)"></userSearch-modal>
+<userSearch-modal #actUser (salesUserSelect)="onSalesUserSelected($event)"></userSearch-modal>
+<sectionSearch-modal #salesSection (salesSectionSelect)="onSalesSectionSelected($event)"></sectionSearch-modal>
+<sectionSearch-modal #skanSection (salesSectionSelect)="onSalesSectionSelected($event)"></sectionSearch-modal>
+<sectionSearch-modal #callSection (salesSectionSelect)="onSalesSectionSelected($event)"></sectionSearch-modal>
+<sectionSearch-modal #taioSection (salesSectionSelect)="onSalesSectionSelected($event)"></sectionSearch-modal>
+<sectionSearch-modal #actSection (salesSectionSelect)="onSalesSectionSelected($event)"></sectionSearch-modal>
+<projectSearch-modal #project (projectSearchSelect)="onProjectSearchSelected($event)"></projectSearch-modal>
+<customerSearch-modal #customer></customerSearch-modal>
+<equipmentSearch-modal #equipment></equipmentSearch-modal>
+
+<div id="editApp">
+  <div ng-controller="EditController as main" class="container-fluid">
+    <!--
+                <button onclick="onHrefLink('./IncidentEdit.php')">load</button>
+                <button ng-click="onHrefLink('./IncidentEdit.php')">load angular</button>
+                <button ng-click="main.test()">load angular</button>
+                -->
+    <div class="text-right transition-button">
+      <span>
+        <button type="button" class="btn btn-danger" (click)="common.openModal('確認','編集内容を登録します。宜しいですか？','OK','キャンセル')"
+        type="submit" value="登録">登録</button>
+        <!-- <button type="button" (click)="reset('all')" class="btn"> リセット</button> -->
+      </span>
+      <span>
+        <button type="button" class="btn btn-danger" routerLink="/detail/{{incidentId}}" routerLinkActive="current" [routerLinkActiveOptions]="{ exact: true }" *ngIf="incidentId">
+          閲覧へ戻る
+        </button>
+      </span>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="panel panel-danger">
+          <div class="panel-heading clearfix">
+            <span class="h3 incident-title-status">{{incidentNo}}</span>
+            <span class="h4 incident-title-status">　{{incidentStatusNm}}</span>
+            <div class="pull-right">
+              <strong>登録日：{{insDate | datex:'YYYY/MM/DD HH:mm'}} {{insUserNm}}　最終更新日：{{updDate | datex:'YYYY/MM/DD HH:mm'}} {{updUserNm}}</strong>
+            </div>
+          </div>
+          <!-- /.panel-heading -->
+          <div class="panel-body context-margin">
+            <form #myForm="ngForm" (ngSubmit)="show()" novalidate>
+              <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>インシデント分類：
+                      <span class="require">＊</span>
+                    </strong>
+                  </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                  <select #sel_incidentType="ngModel" name="sel_incidentType" class="form-control edit-dropdown" [(ngModel)]="incidentTypeCd" required>
+                    <option value=""></option>
+                    <option *ngFor="let item of incidentTypeArray" [value]='item.value'>
+                      {{item.label}}
+                    </option>
+                  </select>
+                  <span class="text-danger" *ngIf="sel_incidentType.errors?.required && sel_incidentType.dirty">
+                    インシデント分類は必須入力です。
+                  </span>
+                </div> 
+                <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>親インシデント番号：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                  <div class="input-group">
+                    <input name="txt_parentIncidentNo" type="text" class="form-control" [(ngModel)]="parentIncidentNo" readonly>
+                    <input name="hid_parentIncidentId" type="hidden" [(ngModel)]="parentIncidentId">
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-input-support" (click)="incident.openModal()">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>発生日時：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                  <div class="input-group">
+                    <input id="txt_incidentStartDate" name="txt_incidentStartDate" type="text" class="form-control" 
+                    #dpIncidentStartDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
+                      [(bsValue)]="incidentStartDate">
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-input-support" (click)="dpIncidentStartDate.toggle()">
+                        <i class="fa fa-calendar"></i>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                  <div class="input-group">
+                    <select name="sel_incidentStartTime" class="search-dropdown" [(ngModel)]="incidentStartTime">
+                      <option *ngFor="let data of timeList" [value]="data.val">{{data.label}}</option>
+                    </select>
+                    :
+                    <select name="sel_incidentStartMinite" class="search-dropdown" [(ngModel)]="incidentStartMinite">
+                      <option *ngFor="let data of miniteList" [value]="data.val">{{data.label}}</option>
+                    </select>
+                  </div>
+                </div>
+                <span class="text-danger" *ngIf="checkDateShowincidentStartDate">
+                  発生日時に、日付を入力してください。
+                </span>
+              </div>
+              <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>業種区分：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                  <select name="sel_industryTypeCd" class="form-control edit-dropdown" [(ngModel)]="industryTypeCd">
+                    <option value=""></option>
+                    <option *ngFor="let item of industryTypeArray" [value]='item.value'>
+                      {{item.label}}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>情報提供元：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                  <select name="sel_infoSourceCd" class="form-control edit-dropdown" [(ngModel)]="infoSourceCd">
+                    <option value=""></option>
+                    <option *ngFor="let item of infoSourceArray" [value]='item.value'>
+                      {{item.label}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>情報提供者：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                  <input #txt_infoProvider="ngModel" name="txt_infoProvider" type="text" class="form-control" [(ngModel)]="infoProvider" maxlength="250">
+                  <span class="text-danger" *ngIf="txt_infoProvider.errors?.maxlength && txt_infoProvider.dirty">
+                    情報提供者は、250文字まで入力可能です。
+                  </span>
+                </div>
+                <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>情報提供TEL：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                  <input #txt_infoProviderTel="ngModel" name="infoProvidedTel" type="text" class="form-control" [(ngModel)]="infoProvidedTel" maxlength="15">
+                  <span class="text-danger" *ngIf="txt_infoProviderTel.errors?.maxlength && txt_infoProviderTel.dirty">
+                    情報提供TELは、15文字まで入力可能です。
+                  </span>
+                </div>
+              </div>
+              <div class="row file-row">
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>添付ファイル：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                  <input #iFile name="incidentFile" type="file" [(ngModel)]="incidentFile">
+                </div>
+              </div>
+              <!-- <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label>
+                    <strong>関係者：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                  <div class="input-group">
+                    <input type="text" class="form-control">
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-input-support">
+                        <i class="fa fa-user"></i>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-offset-2 col-md-offset-3 col-sm-offset-3 col-xs-offset-3 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  &nbsp;&nbsp;
+                  <a>
+                    <u>関係者を追加</u>
+                  </a>
+                </div>
+              </div> -->
+              <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                  <label for="InputTextarea">
+                    <strong>注記：</strong>
+                  </label>
+                </div>
+                <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9">
+                  <textarea #txt_memo="ngModel" name="memo" class="form-control" id="InputTextarea" rows="3" [(ngModel)]="memo" maxlength="2000"></textarea>
+                  <span class="text-danger" *ngIf="txt_memo.errors?.maxlength && txt_memo.dirty">
+                    注記は、2000文字まで入力可能です。
+                  </span>
+                </div>
+              </div>
+              <h5 class="context-header">
+                <strong>設備情報及び顧客情報</strong>
+              </h5>
+              <div class="setubi-and-cust-info-border">
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>機場：
+                        <span class="require">＊</span>
+                      </strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9">
+                    <div class="input-group">
+                      <input #txt_kijoNm="ngModel" name="txt_kijoNm" type="text" class="form-control" [(ngModel)]="kijoNm" required readonly>
+                      <input name="hid_kijoId" type="hidden" [(ngModel)]="kijoId">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="kijo.openModal()">
+                          <i class="fa fa-industry"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <span class="text-danger" *ngIf="txt_kijoNm.errors?.required && txt_kijoNm.dirty">
+                      機場は必須入力です。
+                    </span>
+                  </div>
+                </div>
+                <!-- <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>事業主体：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="jigyosyutaiNm" type="text" class="form-control" [(ngModel)]="jigyosyutaiNm">
+                      <input name="hid_jigyosyutaiId" type="hidden" [(ngModel)]="jigyosyutaiId">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support">
+                          <i class="fa fa-building"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div> -->
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>事業主体：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input name="jigyosyutaiNm" type="text" class="form-control" [(ngModel)]="jigyosyutaiNm" readonly>
+                    <input name="hid_jigyosyutaiId" type="hidden" [(ngModel)]="jigyosyutaiId">
+                  </div>
+                  <div class="col-lg-7 col-md-6 col-sm-6 col-xs-6">
+                    <button type="button" (click)="jigyosyutaiClear()" class="btn btn-xs btn-warning">クリア</button>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>設備：
+                        <span class="require">＊</span>
+                      </strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9">
+                    <div class="input-group">
+                      <input #txt_setubiNm="ngModel" name="setubiNm" type="text" class="form-control" [(ngModel)]="setubiNm" required readonly>
+                      <input name="hid_setubiId" type="hidden" [(ngModel)]="setubiId">
+                      <span class="input-group-btn">
+                        <!-- <button type="button" class="btn btn-input-support"> -->
+                        <button type="button" class="btn btn-input-support" (click)="equipment.openModal()">
+                          <i class="fa fa-cog"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <span class="text-danger" *ngIf="txt_setubiNm.errors?.required && txt_setubiNm.dirty">
+                      設備は必須入力です。
+                    </span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>都道府県：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_prefId" class="form-control edit-dropdown" [(ngModel)]="prefId">
+                      <option value=""></option>
+                      <option *ngFor="let item of prefArray" [value]='item.value'>
+                        {{item.label}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>納入プロジェクト：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="deliveryPjNm" type="text" class="form-control" [(ngModel)]="deliveryPjNm" readonly>
+                      <input name="hid_deliveryPjId" type="hidden" [(ngModel)]="deliveryPjId">
+                      <span class="input-group-btn">
+                        <!-- <button type="button" class="btn btn-input-support"> -->
+                        <button type="button" class="btn btn-input-support" (click)="project.openModal()">
+                          <i class="fa fa-wrench"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>顧客：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="custNm" type="text" class="form-control" [(ngModel)]="custNm" readonly>
+                      <input name="hid_cudtId" type="hidden" [(ngModel)]="custId">
+                      <span class="input-group-btn">
+                        <!-- <button type="button" class="btn btn-input-support"> -->
+                        <button type="button" class="btn btn-input-support" (click)="customer.openModal()">
+                          <i class="fa fa-address-card-o"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>顧客分類：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_custTypeCd" class="form-control edit-dropdown" [(ngModel)]="custTypeCd">
+                      <option value=""></option>
+                      <option *ngFor="let item of custTypeArray" [value]='item.value'>
+                        {{item.label}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>会社名・所属部署：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_custDept="ngModel" name="custDept" type="text" class="form-control" [(ngModel)]="custDept" maxlength="100">
+                    <span class="text-danger" *ngIf="txt_custDept.errors?.maxlength && txt_custDept.dirty">
+                      会社名・所属部署は、100文字まで入力可能です。
+                    </span>
+                  </div>
+                  <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>依頼者：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_requester="ngModel" name="requester" type="text" class="form-control" [(ngModel)]="requester" maxlength="250">
+                    <span class="text-danger" *ngIf="txt_requester.errors?.maxlength && txt_requester.dirty">
+                      依頼者は、250文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>連絡先(TEL)：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_contactTel="ngModel" name="contactTel" type="text" class="form-control" [(ngModel)]="contactTel" maxlength="15">
+                    <span class="text-danger" *ngIf="txt_contactTel.errors?.maxlength && txt_contactTel.dirty">
+                      連絡先(TEL)は、15文字まで入力可能です。
+                    </span>
+                  </div>
+                  <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>連絡先(FAX)：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_contactFax="ngModel" name="contactFax" type="text" class="form-control" [(ngModel)]="contactFax" maxlength="15">
+                    <span class="text-danger" *ngIf="txt_contactFax.errors?.maxlength && txt_contactFax.dirty">
+                      連絡先(FAX)は、15文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>連絡先(E-mail)：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_contactMail="ngModel" name="contactMail" type="text" class="form-control" [(ngModel)]="contactMail" maxlength="50">
+                    <span class="text-danger" *ngIf="txt_contactFax.errors?.maxlength && txt_contactFax.dirty">
+                      連絡先(E-mail)は、50文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>営業部門：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="txt_salesDeptNm" type="text" class="form-control" [(ngModel)]="salesDeptNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="salesSection.openModal('salesSection')">
+                          <i class="fa fa-building"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <input name="hid_salesDeptCd" type="hidden" [(ngModel)]="salesDeptCd">
+                  </div>
+                  <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>営業担当者：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="txt_salesUserNm" type="text" class="form-control" [(ngModel)]="salesUserNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="salesUser.openModal('salesUser')">
+                          <i class="fa fa-user"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <input name="hid_salesUserId" type="hidden" [(ngModel)]="salesUserId">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>主管部門：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="txt_skanDeptNm" type="text" class="form-control" [(ngModel)]="skanDeptNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="skanSection.openModal('skanSection')">
+                          <i class="fa fa-building"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <input name="hid_skanDeptCd" type="hidden" [(ngModel)]="skanDeptCd">
+                  </div>
+                  <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>主管担当者：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="txt_skanUserNm" type="text" class="form-control" [(ngModel)]="skanUserNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="skanUser.openModal('skanUser')">
+                          <i class="fa fa-user"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <input name="hid_skanUserId" type="hidden" [(ngModel)]="skanUserId">
+                  </div>
+                </div>
+              </div>
+              <h5 class="context-header">
+                <strong>受付情報</strong>
+              </h5>
+              <div class="call-info-border">
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>受付日：
+                        <span class="require">＊</span>
+                      </strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input id="txt_callDate" name="txt_callDate" type="text" class="form-control" #dpCallDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
+                        [(bsValue)]="callDate">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="dpCallDate.toggle()">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <span class="text-danger" *ngIf="checkDateShowCallDate">
+                      受付日に、日付を入力してください。
+                    </span>
+                    <span class="text-danger" *ngIf="checkRequireShowCallDate">
+                      受付日は必須入力です。
+                    </span>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>受付開始時刻：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <select name="sel_callStartTime" class="search-dropdown" [(ngModel)]="callStartTime">
+                        <option *ngFor="let data of timeList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                      :
+                      <select name="sel_callStartMinite" class="search-dropdown" [(ngModel)]="callStartMinite">
+                        <option *ngFor="let data of miniteList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-offset-7 col-md-offset-7 col-sm-offset-6 col-xs-offset-6 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>受付終了時刻：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <select name="sel_callEndTime" class="search-dropdown" [(ngModel)]="callEndTime">
+                        <option *ngFor="let data of timeList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                      :
+                      <select name="sel_callEndMinite" class="search-dropdown" [(ngModel)]="callEndMinite">
+                        <option *ngFor="let data of miniteList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>受付部署：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="callDeptNm" type="text" class="form-control" [(ngModel)]="callDeptNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="callSection.openModal('callSection')">
+                          <i class="fa fa-building"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>受付者：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="callUserNm" type="text" class="form-control" [(ngModel)]="callUserNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="callUser.openModal('callUser')">
+                          <i class="fa fa-user"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>TEL：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_callTel="ngModel" name="callTel" type="text" class="form-control" [(ngModel)]="callTel" maxlength="15">
+                    <span class="text-danger" *ngIf="txt_callTel.errors?.maxlength && txt_callTel.dirty">
+                      受付情報のTELは、15文字まで入力可能です。
+                    </span>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>E-mail：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_callMail="ngModel" name="callMail" type="text" class="form-control" [(ngModel)]="callMail" maxlength="50">
+                    <span class="text-danger" *ngIf="txt_callMail.errors?.maxlength && txt_callMail.dirty">
+                      受付情報のE-mailは、50文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label for="InputTextarea">
+                      <strong>受付内容：
+                        <span class="require">＊</span>
+                      </strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-10 col-md-10 col-sm-9 col-xs-9">
+                    <textarea #txt_callContent="ngModel" name="callContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="callContent" required maxlength="2000"></textarea>
+                    <span class="text-danger" *ngIf="txt_callContent.errors?.required && txt_callContent.dirty">
+                      受付内容は必須入力です。
+                    </span>
+                    <span class="text-danger" *ngIf="txt_callContent.errors?.maxlength && txt_callContent.dirty">
+                      受付内容は、2000文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <h5 class="context-header">
+                <strong>対応情報</strong>
+              </h5>
+              <div class="taio-info-border">
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>対応日：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input id="txt_taioDate" name="txt_taioDate" type="text" class="form-control" #dpTaioDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
+                        [(bsValue)]="taioDate">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="dpTaioDate.toggle();">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>対応開始時刻：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 ">
+                    <div class="input-group">
+                      <select name="sel_taioStartTime" class="search-dropdown" [(ngModel)]="taioStartTime">
+                        <option *ngFor="let data of timeList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                      :
+                      <select name="sel_taioStartMinite" class="search-dropdown" [(ngModel)]="taioStartMinite">
+                        <option *ngFor="let data of miniteList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3"></div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <span class="text-danger" *ngIf="checkDateShowTaioDate">
+                      対応日に、日付を入力してください。
+                    </span>
+                  </div>
+                  <div class="col-lg-offset-7 col-md-offset-7 col-sm-offset-6 col-xs-offset-6 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>対応終了時刻：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <select name="sel_taioEndTime" class="search-dropdown" [(ngModel)]="taioEndTime">
+                        <option *ngFor="let data of timeList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                      :
+                      <select name="sel_taioEndMinite" class="search-dropdown" [(ngModel)]="taioEndMinite">
+                        <option *ngFor="let data of miniteList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>対応部署：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="taioDeptNm" type="text" class="form-control" [(ngModel)]="taioDeptNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="taioSection.openModal('taioSection')">
+                          <i class="fa fa-building"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>対応者：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="taioUserNm" type="text" class="form-control" [(ngModel)]="taioUserNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="taioUser.openModal('taioUser')">
+                          <i class="fa fa-user"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>TEL：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_taioTel="ngModel" name="taioTel" type="text" class="form-control" [(ngModel)]="taioTel" maxlength="15">
+                    <span class="text-danger" *ngIf="txt_taioTel.errors?.maxlength && txt_taioTel.dirty">
+                      対応情報のTELは、15文字まで入力可能です。
+                    </span>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>E-mail：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_taioMail="ngModel" name="taioMail" type="text" class="form-control" [(ngModel)]="taioMail" maxlength="50">
+                    <span class="text-danger" *ngIf="txt_taioMail.errors?.maxlength && txt_taioMail.dirty">
+                      対応情報のE-mailは、50文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label for="InputTextarea">
+                      <strong>対応内容：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-10 col-md-10 col-sm-9 col-xs-9">
+                    <textarea #txt_taioContent="ngModel" name="taioContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="taioContent" maxlength="2000"></textarea>
+                    <span class="text-danger" *ngIf="txt_taioContent.errors?.maxlength && txt_taioContent.dirty">
+                      対応内容は、2000文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <h5 class="context-header">
+                <strong>処置情報</strong>
+              </h5>
+              <div class="action-info-border">
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>処置予定日：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input id="txt_actDate" name="txt_actDate" type="text" class="form-control" #dpActDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig" [(bsValue)]="actDate">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="dpActDate.toggle();">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <span class="text-danger" *ngIf="checkDateShowActDate">
+                      処置予定日に、日付を入力してください。
+                    </span>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>処置区分：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_actTypeCd" class="form-control edit-dropdown" [(ngModel)]="actTypeCd">
+                      <option value=""></option>
+                      <option *ngFor="let item of actTypeArray" [value]='item.value'>
+                        {{item.label}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>処置開始日時：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                    <div class="input-group">
+                      <input id="txt_actStartDate" name="txt_actStartDate" type="text" class="form-control" #dpActStartDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
+                        [(bsValue)]="actStartDate">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="dpActStartDate.toggle();">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <span class="text-danger" *ngIf="checkDateShowActStartDate">
+                      処置開始日時に、日付を入力してください。
+                    </span>
+                  </div>
+                  <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                    <div class="input-group">
+                      <select name="sel_actStartTime" class="search-dropdown" [(ngModel)]="actStartTime">
+                        <option *ngFor="let data of timeList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                      :
+                      <select name="sel_actStartMinite" class="search-dropdown" [(ngModel)]="actStartMinite">
+                        <option *ngFor="let data of miniteList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>処置終了日時：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                    <div class="input-group">
+                      <input id="txt_actEndDate" name="txt_actEndDate" type="text" class="form-control" #dpActEndDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
+                        [(bsValue)]="actEndDate">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="dpActEndDate.toggle();">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <span class="text-danger" *ngIf="checkDateShowActEndDate">
+                      処置終了日時に、日付を入力してください。
+                    </span>
+                  </div>
+                  <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                    <div class="input-group">
+                      <select name="sel_actEndTime" class="search-dropdown" [(ngModel)]="actEndTime">
+                        <option *ngFor="let data of timeList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                      :
+                      <select name="sel_actEndMinite" class="search-dropdown" [(ngModel)]="actEndMinite">
+                        <option *ngFor="let data of miniteList" [value]="data.val">{{data.label}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>処置部署：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="actDeptNm" type="text" class="form-control" [(ngModel)]="actDeptNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="actSection.openModal('actSection')">
+                          <i class="fa fa-building"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>処置者：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <div class="input-group">
+                      <input name="actUserNm" type="text" class="form-control" [(ngModel)]="actUserNm" readonly>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-input-support" (click)="actUser.openModal('actUser')">
+                          <i class="fa fa-user"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>TEL：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_actTel="ngModel" name="actTel" type="text" class="form-control" [(ngModel)]="actTel" maxlength="15">
+                    <span class="text-danger" *ngIf="txt_actTel.errors?.maxlength && txt_actTel.dirty">
+                      処置情報のTELは、15文字まで入力可能です。
+                    </span>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>E-mail：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_actMail="ngModel" name="actMail" type="text" class="form-control" [(ngModel)]="actMail" maxlength="50">
+                    <span class="text-danger" *ngIf="txt_actMail.errors?.maxlength && txt_actMail.dirty">
+                      処置情報のE-mailは、50文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label for="InputTextarea">
+                      <strong>処置結果：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-10 col-md-10 col-sm-9 col-xs-9">
+                    <textarea #txt_actContent="ngModel" name="actContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="actContent" maxlength="2000"></textarea>
+                    <span class="text-danger" *ngIf="txt_actContent.errors?.maxlength && txt_actContent.dirty">
+                      処置結果は、2000文字まで入力可能です。
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <h5 class="context-header">
+                <strong>製品情報</strong>
+              </h5>
+              <div class="product-info-border">
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>機種区分：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-10 col-md-10 col-sm-9 col-xs-9">
+                    <select name="sel_productTypeCd" class="form-control edit-dropdown" [(ngModel)]="productTypeCd">
+                      <option value=""></option>
+                      <option *ngFor="let item of productTypeArray" [value]='item.value'>
+                        {{item.label}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <h5 class="context-sub-header">
+                  <strong>障害状況</strong>
+                </h5>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>　トリガー：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_productTriggerCd" class="form-control edit-dropdown" [(ngModel)]="productTriggerCd">
+                      <option value=""></option>
+                      <option *ngFor="let item of productTriggerArray" [value]='item.value'>
+                        {{item.label}}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>頻度：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_productHindoCd" class="form-control edit-dropdown" [(ngModel)]="productHindoCd">
+                      <option value=""></option>
+                      <option *ngFor="let item of productHindoArray" [value]='item.value'>
+                        {{item.label}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>　現象：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_productGensyoCd" class="form-control edit-dropdown" [(ngModel)]="productGensyoCd">
+                      <option value=""></option>
+                      <option *ngFor="let item of productGensyoArray" [value]='item.value'>
+                        {{item.label}}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>状態：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_productStatusCd" class="form-control edit-dropdown" [(ngModel)]="productStatusCd">
+                      <option value=""></option>
+                      <option *ngFor="let item of productStatusArray" [value]='item.value'>
+                        {{item.label}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+          </div>
+          <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+
+        <h4 class="panel-header text-primary">
+          <strong>▼関係者</strong>
+        </h4>
+        <div class="panel panel-default">
+          <div class="panel-body context-margin">
+            <h5 class="context-header">
+              <strong>
+                <i class="fa fa-dot-circle-o" aria-hidden="true"></i> 変更を通知する／
+                <i class="fa fa-circle-o" aria-hidden="true"></i> 変更を通知しない
+              </strong>
+            </h5>
+            <div class="context-margin">
+<!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add Start newtouch -->
+              <ul *ngFor="let dept of relateUserList;let deptIdx = index;" style="list-style:none;padding-left: 0px;">
+                <div>{{dept.relateUserSectionNm}}</div>
+                <li *ngFor="let user of dept.relateUsers;let userIdx = index;">
+                  <div style="width:235px;display: inline-block;">
+                    <span class="context-margin relate-user-nm"> 
+                      {{user.relateUserNm}} 
+                      <span *ngIf="user.kidokuDate != ''">（既読日：{{user.kidokuDate}}）</span>
+                    </span>
+                  </div>
+                </li>
+              </ul>
+<!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add End   newtouch -->
+            </div>
+          </div>
+          <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+
+        <h4 class="panel-header text-primary">
+          <strong>▼関連リンク</strong>
+        </h4>
+        <div class="panel panel-default">
+          <div class="panel-body context-margin">
+            <h5 class="context-header">
+              <strong>プロジェクト情報
+                <span class="text-danger">※プロジェクト情報はＡＲＣＳから行なってください。（ＡＲＣＳ登録後の翌日反映）</span>
+              </strong>
+            </h5>
+            <div class="context-margin">
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>プロジェクト番号：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <a (click)="showPj()">
+                    <u>J1000000</u>
+                  </a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>PJ主管部門：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">プロ主管</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>プロジェクト名：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>PM：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">川本　健</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>代表機場：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>都道府県：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">東京都</div>
+              </div>
+            </div>
+            <h5 class="context-header">
+              <strong>障害対応報告書(MR2)</strong>
+            </h5>
+            <div *ngFor="let data of MR2List" class="context-margin">
+              <a (click)="showMr2(data?.mkbid)">
+                <u *ngIf="data?.subjectNm.length > 0">{{data?.subjectNm}}</u>
+                <u *ngIf="data?.subjectNm.length == 0">（件名なし）</u>
+              </a>
+              <div class="context-margin">
+                <div class="row">
+                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                    <strong>作成日：</strong>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.makeDate | date:'yyyy/MM/dd'}}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                    <strong>依頼元：</strong>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.requestUserNm}}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                    <strong>作業担当者：</strong>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.workUserNm}}</div>
+                </div>
+              </div>
+            </div>
+            <h5 class="context-header">
+              <strong>労災・事故・クレーム連絡</strong>
+            </h5>
+            <div class="context-margin">
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>状態：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">第1報 正式発行</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>区分：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">品質（ランクＡ）</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>概要：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <a (click)="showJiko()">
+                    <u>XXXXXXXXXXXXXXXXXXXXXX</u>
+                  </a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>顧客名：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">川本　健</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>機場名：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>発行日：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">2017/1/1</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>発行元：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
+              </div>
+            </div>
+            <h5 class="context-header">
+              <strong>費用決済申請</strong>
+            </h5>
+            <div class="context-margin">
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>ID番号：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <a (click)="showHiyo('dsp','dsp',416161,'','1282')">
+                    <u>XXXXXXXXXX</u>
+                  </a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>ステータス：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">決裁</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>区分：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">クレーム対応</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>決裁番号：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">無償 第X号</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>件名：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">XXXXXXXXXXXXXXXXXXXXXX</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>概算金額：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <div class="pull-right">123,456</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+
+        <h4 class="panel-header text-primary">
+          <strong>▼関連インシデント</strong>
+        </h4>
+        <div class="panel panel-default">
+          <div class="panel-body context-margin">
+            <h5 class="context-header">
+              <strong>同一機場インシデント</strong>
+            </h5>
+            <div class="context-margin" *ngFor="let jikoIdList of relateIncidentKijoIdList">
+              <a (click)="showRelateIncident()">
+                <u>#{{jikoIdList.relateIncidentNo}} {{jikoIdList.relateIncidentType}} {{jikoIdList.relateIncidentStartDateTime}} {{jikoIdList.relateIncidentKijoNm}} {{jikoIdList.relateIncidentCustNm}}</u>
+              </a>
+              <div class="context-margin">
+                {{jikoIdList.relateIncidentContent}}
+              </div>
+            </div>
+            <h5 class="context-header">
+              <strong>同一顧客インシデント</strong>
+            </h5>
+            <div class="context-margin" *ngFor="let custNmList of relateIncidentCustNmList">
+              <a (click)="showRelateIncident()">
+                <u>#{{custNmList.relateIncidentNo}} {{custNmList.relateIncidentType}} {{custNmList.relateIncidentStartDateTime}} {{custNmList.relateIncidentKijoNm}} {{custNmList.relateIncidentCustNm}}</u>
+              </a>
+              <div class="context-margin">
+                {{custNmList.relateIncidentContent}}
+              </div>
+            </div>
+          </div>
+          <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+      </div>
+    </div>
+    <!-- /.row -->
+  </div>
+</div>

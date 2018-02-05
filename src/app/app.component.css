@@ -1,0 +1,26 @@
+
+/*
+.container-fluid {
+    position: relative !important;
+    z-index: -100 !important;
+}
+
+.dropdown-backdrop {
+    position: relative !important;
+    z-index: 200 !important;
+}
+*/
+
+/* ドロップダウンメニューをテキストエリア内に収める(検索画面) */
+.search-dropdown {
+    /*height: 35px;*/
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+/* ドロップダウンメニューをテキストエリア内に収める(登録画面) */
+.edit-dropdown {
+    /*height: 35px;*/
+    padding-top: 0px;
+    padding-bottom: 0px;
+}

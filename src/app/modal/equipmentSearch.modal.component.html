@@ -1,0 +1,156 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：機場モーダル部品
+//	作成日付・作成者：2017.12.22 ADF)Takafumi.Sato
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+<loading [loading]="isLoading"></loading>
+<div bsModal #template="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger">
+        <h4 class="modal-title pull-left">
+          <strong>設備の検索</strong>
+        </h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="template.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transition-button text-right">
+              <button type="button" class="btn btn-danger btn-mini" (click)="clearEquipmentSearch()">
+                リセット
+              </button>
+              <button type="button" class="btn btn-danger btn-mini">
+                <i class="fa fa-search"></i> 検索
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  検索条件1
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchItem1" type="text" class="form-control" [(ngModel)]="searchItem1">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  検索条件2
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchItem2" type="text" class="form-control" [(ngModel)]="searchItem2">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  検索条件3
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchItem3" type="text" class="form-control" [(ngModel)]="searchItem3">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  検索条件4
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchItem4" type="text" class="form-control" [(ngModel)]="searchItem4">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  検索条件5
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchItem5" type="text" class="form-control" [(ngModel)]="searchItem5">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 search-result-info">
+              検索結果：　100件
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
+              <pagination name="paging1" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
+                class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;"></pagination>
+            </div>
+            <div class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-4">
+              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage"> 件/頁
+            </div>
+          </div>
+
+          <div class="row" id="search-list">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="panel">
+                <table class="table table-striped list-table">
+                  <thead>
+                    <tr>
+                      <th class="table-header-list"></th>
+                      <th class="table-header-list">項目1</th>
+                      <th class="table-header-list">項目2</th>
+                      <th class="table-header-list">項目3</th>
+                      <th class="table-header-list">項目4</th>
+                      <th class="table-header-list">項目5</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let data of equipmentList">
+                      <td class="code-list">
+                        <button type="button" class="btn btn-danger btn-mini">
+                          選択
+                        </button>
+                      </td>
+                      <td class="char-list">{{data.item1}}</td>
+                      <td class="char-list">{{data.item2}}</td>
+                      <td class="char-list">{{data.item3}}</td>
+                      <td class="char-list">{{data.item4}}</td>
+                      <td class="char-list">{{data.item5}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
+              <pagination name="paging2" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
+                class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;"></pagination>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
