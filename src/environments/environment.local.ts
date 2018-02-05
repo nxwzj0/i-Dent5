@@ -6,8 +6,8 @@
 export const environment = {
   production: false,
   location: 'local',
-  envPath: 'http://172.20.108.34/INCIDENT/',
-  envCommonPath: 'http://172.20.108.34/COMMONAPI/',
-  jikoPath: 'http://172.20.108.34/JIKO/',
-  hiyoPath: 'http://172.20.108.34/WORKFLOW/',
+  envPath: 'http://localhost/INCIDENT/',
+  envCommonPath: 'http://localhost/COMMONAPI/',
+  jikoPath: 'http://localhost/JIKO/',
+  hiyoPath: 'http://localhost/WORKFLOW/',
 };
