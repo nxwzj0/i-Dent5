@@ -24,10 +24,10 @@
 
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transition-button text-right">
-              <button type="button" class="btn btn-danger btn-mini" (click)="clearCustomerSearch()">
+              <button type="button" (click)="clearCustomerSearch()" class="btn btn-danger btn-mini">
                 リセット
               </button>
-              <button type="button" class="btn btn-danger btn-mini">
+              <button type="button" class="btn btn-danger btn-mini" (click)="search()">
                 <i class="fa fa-search"></i> 検索
               </button>
             </div>
@@ -37,34 +37,54 @@
             <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
               <div class="row">
                 <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
-                  顧客名
-                </label>
-              </div>
-            </div>
-            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
-              <input name="searchPjNo" type="text" class="form-control" [(ngModel)]="searchCustomerNm">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
-              <div class="row">
-                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
                   顧客コード
                 </label>
               </div>
             </div>
             <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
-              <input name="searchInqNo" type="text" class="form-control" [(ngModel)]="searchCustomerCd">
+              <input name="searchCustomerCd" type="text" class="form-control" [(ngModel)]="searchCustomerCd">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  顧客名 事業所名
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchCustomerNm" type="text" class="form-control" [(ngModel)]="searchCustomerNm">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  所在地
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="searchAddress" type="text" class="form-control" [(ngModel)]="searchAddress">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 search-result-info">
+              検索結果：　{{bigTotalItems}}件
             </div>
           </div>
 
           <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-7 col-xs-8">
-              <pagination name="paging1" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize"
-                class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;"></pagination>
+              <pagination name="paging1" [boundaryLinks]="true" [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [itemsPerPage]="itemsPerPage"
+                class="pagination-sm" [rotate]="false" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" (click)="pageChanged($event)"></pagination>
             </div>
             <div class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-4">
-              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage"> 件/頁
+              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged()"> 件/頁
             </div>
           </div>
 
@@ -75,19 +95,21 @@
                   <thead>
                     <tr>
                       <th class="table-header-list"></th>
-                      <th class="table-header-list">顧客名</th>
                       <th class="table-header-list">顧客コード</th>
+                      <th class="table-header-list">顧客名 事業所名</th>
+                      <th class="table-header-list">所在地</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let data of customerList">
+                    <tr *ngFor="let data of customerList | slice: start: end">
                       <td class="code-list">
-                        <button type="button" class="btn btn-danger btn-mini">
+                        <button type="button" class="btn btn-danger btn-mini" (click)="onSelect(data?.customerCd, data?.customerNm, data?.address)">
                           選択
                         </button>
                       </td>
-                      <td class="char-list">{{data.customerNm}}</td>
                       <td class="char-list">{{data.customerCd}}</td>
+                      <td class="char-list">{{data.customerNm}}</td>
+                      <td class="char-list">{{data.address}}</td>
                     </tr>
                   </tbody>
                 </table>

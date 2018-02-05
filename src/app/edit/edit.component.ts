@@ -245,6 +245,16 @@ export class EditComponent implements OnInit {
 
   }
 
+// ::: 2018.02.02 [#35] 入力補助モーダル　取引先 Add Start newtouch
+  // 顧客（取引先）
+  onCustomerSearchSelected($event: any) {
+    if ($event) {
+      this.custId = $event["customerCd"]; // 顧客ID 
+      this.custNm = $event["customerNm"]; // 顧客名
+    }
+  }
+// ::: 2018.02.02 [#35] 入力補助モーダル　取引先 Add End   newtouch
+
   // 親インシデント番号
   onIncidentSearchSelected($event: any) {
     if ($event) {

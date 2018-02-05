@@ -1,4 +1,4 @@
-import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { Component, TemplateRef, ViewChild, Output, EventEmitter  } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { URLSearchParams } from '@angular/http';
 
@@ -20,43 +20,104 @@ export class CustomerSearchModalComponent {
 
   modalRef: BsModalRef;
 
-  constructor(private modalService: BsModalService) { }
+  // 顧客（取引先）イベント
+  @Output() customerSearchSelect: EventEmitter<any> = new EventEmitter();
+
+  constructor(private modalService: BsModalService,private jsonpService: JsonpService) { }
 
   isLoading: boolean = false;
 
   // 検索条件
-  searchCustomerNm = "";
   searchCustomerCd = "";
+  searchCustomerNm = "";
+  searchAddress = "";
 
   // ページングの設定
-  maxSize: number = 5;
-  bigTotalItems: number = 100;
-  bigCurrentPage: number = 1;
-  numPages: number = 0;
-  itemsPerPage: number = 10;
+  maxSize: number = 5; // ページングの表示ページ数
+  bigTotalItems: number = 0; // 総数
+  itemsPerPage: number = 10; // 1ページに表示する件数
+  currentPage: number = 0; // 現在表示しているページ
+  start: number = 0; // データ表示開始位置
+  end: number = 10; // データ表示終了位置
 
   // ページング処理
   pageChanged(event: any): void {
-    console.log('Page changed to: ' + event.page);
-    console.log('Number items per page: ' + event.itemsPerPage);
+    this.start = this.itemsPerPage * (this.currentPage - 1);
+    let tmpStart: number = +this.start;
+    let tmpItemsPerPage: number = +this.itemsPerPage;
+    this.end = tmpStart + tmpItemsPerPage;
   }
 
   // モーダル表示
   openModal() {
+    this.clearCustomerSearch();
     this.template.show();
+    this.search();
   }
 
   // 検索条件の初期化
   clearCustomerSearch() {
-    this.searchCustomerNm = "";
     this.searchCustomerCd = "";
+    this.searchCustomerNm = "";
+    this.searchAddress = "";
   }
 
-  // TODO 一時表示用　固定インシデント情報 
- customerList = [
-    {
-      "customerNm": "1",
-      "customerCd": "2"
-    }
-  ];
+  // 検索処理
+  search() {
+    this.isLoading = true;
+    // 検索パラメータの作成
+    let ps = new URLSearchParams();
+    ps.set("customerCd", this.searchCustomerCd);
+    ps.set("customerNm", this.searchCustomerNm);
+    ps.set("address", this.searchAddress);
+
+    // 検索
+    this.jsonpService.commonRequestGet('CustomerListDataGet.php', ps)
+      .subscribe(
+      data => {
+        // 通信成功時
+        console.log(data);
+        if (data[0]) {
+          let list = data[0];
+          if (list.result !== '' && list.result == true) {
+            // 画面表示パラメータのセット処理
+            this.setDspParam(data.slice(1)); // 配列1つ目は、サーバ処理成功フラグなので除外
+          }
+        }
+        this.currentPage = 1;
+        this.pageChanged(null);
+        this.isLoading = false;
+      },
+      error => {
+        // 通信失敗もしくは、コールバック関数内でエラー
+        console.log(error);
+        console.log('サーバとのアクセスに失敗しました。');
+        this.isLoading = false;
+        return false;
+      }
+      );
+  }
+
+  // 顧客（取引先）検索結果リスト
+  customerList = [];
+  // 画面表示パラメータのセット処理
+  setDspParam(data) {
+    // ページングの設定
+    this.bigTotalItems = data.length;
+    // 顧客（取引先）リストをセット
+    this.customerList = data;
+  }
+
+  // 選択ボタンクリック
+  onSelect(customerCd: any, customerNm: any, address: any) {
+    // 顧客（取引先）
+    this.customerSearchSelect.emit({
+      "customerCd": customerCd
+      , "customerNm": customerNm
+      , "address": address 
+    });
+    // モーダルの非表示
+    this.template.hide();
+  }
+
 }
