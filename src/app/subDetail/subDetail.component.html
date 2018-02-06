@@ -9,12 +9,12 @@
 //*****************************************************************************
 -->
 <loading [loading]="isLoading"></loading>
-<my-header></my-header>
+<!-- <my-header></my-header> -->
 <common-modal #common (commonEnter)="donothing()"></common-modal>
 
 <div ng-cloak>
   <div class="container-fluid">
-    <div class="text-right transition-button">
+    <div class="text-right transition-button" style="margin-top: 15px;">
       <span>
         <button type="button" class="btn btn-warning" (click)="windowClose()">閉じる</button>
       </span>
