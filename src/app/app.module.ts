@@ -16,6 +16,7 @@ import { HeaderComponent } from './header/header.component';
 import { TopComponent } from './top/top.component';
 import { ListComponent } from './list/list.component';
 import { DetailComponent } from './detail/detail.component';
+import { SubDetailComponent } from './subDetail/subDetail.component';
 import { EditComponent } from './edit/edit.component';
 import { Mr2Component } from './mr2/mr2.component';
 import { ProjectComponent } from './project/project.component';
@@ -50,6 +51,7 @@ import { DatexPipe } from './pipe/datex.pipe';
     TopComponent,
     ListComponent,
     DetailComponent,
+    SubDetailComponent,
     EditComponent,
     Mr2Component,
     ProjectComponent,

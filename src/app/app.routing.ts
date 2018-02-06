@@ -5,6 +5,7 @@ import { ErrorComponent } from './error.component';
 import { TopComponent } from './top/top.component';
 import { ListComponent } from './list/list.component';
 import { DetailComponent } from './detail/detail.component';
+import { SubDetailComponent } from './subDetail/subDetail.component';
 import { EditComponent } from './edit/edit.component';
 import { Mr2Component } from './mr2/mr2.component';
 import { ProjectComponent } from './project/project.component';
@@ -13,6 +14,7 @@ import { CommonComponent } from './common/common.component';
 const myRoutes = [
   { path: 'common/:msg/:nextUrl', component: CommonComponent, data: { category:'common'}},
   { path: 'detail/:incidentId', component: DetailComponent, data: { category:'detail'}},
+  { path: 'subDetail/:incidentId', component: SubDetailComponent, data: { category:'subDetail'}},
   { path: 'edit/:incidentId', component: EditComponent, data: { category:'edit'}},
   { path: 'edit', component: EditComponent, data: { category:'edit'}},
   { path: 'list/k/:keyword', component: ListComponent, data: { category:'list/k'}},
