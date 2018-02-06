@@ -241,8 +241,9 @@ export class EditComponent implements OnInit {
   }
 
   // 関連インシデント表示処理
-  showRelateIncident() {
-
+  showRelateIncident(relateIncidentId) {
+    if (this.SUB_WIN) this.SUB_WIN.close();
+    this.SUB_WIN = this.CMN_openNewWindow1("./#/subDetail/" + relateIncidentId, "sub_detail", 1000, 760);
   }
 
 // ::: 2018.02.02 [#35] 入力補助モーダル　取引先 Add Start newtouch
