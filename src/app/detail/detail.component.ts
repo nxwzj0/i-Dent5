@@ -50,6 +50,13 @@ export class DetailComponent implements OnInit {
       ps.set('incidentId', prmIncientId);
     }
 
+    // ::: 2018.02.01 [#34] 関係者の既読処理 Add Start newtouch
+    ps.set('userId', this.userId);
+    ps.set('userName', this.userName);
+    ps.set('sectionCd', this.sectionCd);
+    ps.set('sectionName', this.sectionName);
+    // ::: 2018.02.01 [#34] 関係者の既読処理 Add End   newtouch
+
     // 画面表示パラメータの取得処理
     this.isLoading = true;
     this.jsonpService.requestGet('IncidentDataGet.php', ps)
