@@ -578,12 +578,12 @@
             <h5 class="context-header">
               <strong>同一顧客インシデント</strong>
             </h5>
-            <div class="context-margin" *ngFor="let custNmList of relateIncidentCustNmList">
-              <a (click)="showRelateIncident(custNmList?.relateIncidentId)">
-                <u>#{{custNmList.relateIncidentNo}} {{custNmList.relateIncidentType}} {{custNmList.relateIncidentStartDateTime}} {{custNmList.relateIncidentKijoNm}} {{custNmList.relateIncidentCustNm}}</u>
+            <div class="context-margin" *ngFor="let custIdList of relateIncidentCustIdList">
+              <a (click)="showRelateIncident(custIdList?.relateIncidentId)">
+                <u>#{{custIdList.relateIncidentNo}} {{custIdList.relateIncidentType}} {{custIdList.relateIncidentStartDateTime}} {{custIdList.relateIncidentKijoNm}} {{custIdList.relateIncidentCustNm}}</u>
               </a>
               <div class="context-margin">
-                {{custNmList.relateIncidentContent}}
+                {{custIdList.relateIncidentContent}}
               </div>
             </div>
           </div>

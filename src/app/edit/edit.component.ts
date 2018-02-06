@@ -92,10 +92,10 @@ export class EditComponent implements OnInit {
         if (data[0]) {
           let one = data[0];
           let relateIncidentKijoId = data['relateIncidentKijiIdAry'];
-          let relateIncidentCustNm = data['relateIncidentCustNmAry'];
+          let relateIncidentCustId = data['relateIncidentCustIdAry'];
           if (one.result !== '' && one.result == true) {
             // 画面表示パラメータのセット処理
-            this.setDspParamRelateIncident(relateIncidentKijoId, relateIncidentCustNm);
+            this.setDspParamRelateIncident(relateIncidentKijoId, relateIncidentCustId);
           }
         }
       },
@@ -473,7 +473,7 @@ export class EditComponent implements OnInit {
 
   // 関連インシデント
   relateIncidentKijoIdList = []; //同一機場インシデント
-  relateIncidentCustNmList = []; //同一顧客インシデント
+  relateIncidentCustIdList = []; //同一顧客インシデント
 
   // 画面表示パラメータのセット処理
   setDspParam(data) {
@@ -598,9 +598,9 @@ export class EditComponent implements OnInit {
     this.MR2List = data;
   }
   // 画面表示パラメータ(関連インシデント)のセット処理
-  setDspParamRelateIncident(relateIncidentKijoId, relateIncidentCustNm) {
+  setDspParamRelateIncident(relateIncidentKijoId, relateIncidentCustId) {
     this.relateIncidentKijoIdList = relateIncidentKijoId;
-    this.relateIncidentCustNmList = relateIncidentCustNm;
+    this.relateIncidentCustIdList = relateIncidentCustId;
   }
 
   checkDateShowincidentStartDate = false; //発生日時(日付型チェック)

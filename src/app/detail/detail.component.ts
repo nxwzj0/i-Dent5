@@ -88,10 +88,10 @@ export class DetailComponent implements OnInit {
       if (data[0]) {
         let one = data[0];
         let relateIncidentKijoId = data['relateIncidentKijiIdAry'];
-        let relateIncidentCustNm = data['relateIncidentCustNmAry'];
+        let relateIncidentCustId = data['relateIncidentCustIdAry'];
         if (one.result !== '' && one.result == true) {
           // 画面表示パラメータのセット処理
-          this.setDspParamRelateIncident(relateIncidentKijoId,relateIncidentCustNm);
+          this.setDspParamRelateIncident(relateIncidentKijoId,relateIncidentCustId);
         }
       }
     },
@@ -390,7 +390,7 @@ export class DetailComponent implements OnInit {
 
   // 関連インシデント
   relateIncidentKijoIdList = []; //同一機場インシデント
-  relateIncidentCustNmList = []; //同一顧客インシデント
+  relateIncidentCustIdList = []; //同一顧客インシデント
 
   // 画面表示パラメータのセット処理
   setDspParam(data) {
@@ -492,9 +492,9 @@ export class DetailComponent implements OnInit {
   }
 
   // 画面表示パラメータ(関連インシデント)のセット処理
-  setDspParamRelateIncident(relateIncidentKijoId,relateIncidentCustNm) {
+  setDspParamRelateIncident(relateIncidentKijoId,relateIncidentCustId) {
     this.relateIncidentKijoIdList = relateIncidentKijoId;
-    this.relateIncidentCustNmList = relateIncidentCustNm;
+    this.relateIncidentCustIdList = relateIncidentCustId;
   }
 
   // ２ー２．障害対応報告(MR2)
