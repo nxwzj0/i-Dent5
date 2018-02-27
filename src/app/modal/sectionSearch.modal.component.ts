@@ -44,10 +44,18 @@ export class SectionSearchModalComponent {
 
   // ページング処理
   pageChanged(event: any): void {
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add Start newtouch
+    if (!(this.itemsPerPage > 0)) {
+      this.itemsPerPage = 10;
+    }
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add End   newtouch
     this.start = this.itemsPerPage * (this.currentPage - 1);
     let tmpStart: number = +this.start;
     let tmpItemsPerPage: number = +this.itemsPerPage;
     this.end = tmpStart + tmpItemsPerPage;
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add Start newtouch
+    this.search();
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add End   newtouch
   }
 
   // モーダル表示
@@ -57,6 +65,13 @@ export class SectionSearchModalComponent {
       this.modalType = modalTypeFromParent;
     }
     this.clearSectionSearch();
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add Start newtouch
+    this.bigTotalItems = 0; // 総数
+    this.itemsPerPage = 10; // 1ページに表示する件数
+    this.currentPage = 0;
+    this.start = 0;
+    this.end = 10;
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add End   newtouch
     this.template.show();
     this.search();
   }
@@ -75,6 +90,10 @@ export class SectionSearchModalComponent {
     ps.set("postCd", this.searchPostCd);
     ps.set("sectionNm", this.searchSectionNm);
     ps.set("companyNm", this.searchCompanyNm);
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add Start newtouch
+    ps.set("pagingStart", (this.start + 1).toString());
+    ps.set("pagingEnd", this.itemsPerPage.toString());
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add End   newtouch
 
     // 検索
     this.isLoading = true;
@@ -87,10 +106,15 @@ export class SectionSearchModalComponent {
           let list = data[0];
           if (list.result !== '' && list.result == true) {
             // 画面表示パラメータのセット処理
+            // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add Start newtouch
+            this.bigTotalItems = list.count; // ページング(総数)
+            // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add End   newtouch
             this.setDspParam(data.slice(1)); // 配列1つ目は、サーバ処理成功フラグなので除外
           }
         }
-        this.currentPage = 1;
+        // ::: 2018.02.27 [#41] ページング修正：部門モーダル Del Start newtouch
+        // :::         this.currentPage = 1;
+        // ::: 2018.02.27 [#41] ページング修正：部門モーダル Del End   newtouch
         this.pageChanged(null);
         this.isLoading = false;
       },
@@ -108,8 +132,10 @@ export class SectionSearchModalComponent {
   sectionList = [];
   // 画面表示パラメータのセット処理
   setDspParam(data) {
-    // ページングの設定
-    this.bigTotalItems = data.length;
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Del Start newtouch
+    // :::     // ページングの設定
+    // :::     this.bigTotalItems = data.length;
+    // ::: 2018.02.27 [#41] ページング修正：部門モーダル Del End   newtouch
     // 部門情報 リストをセット
     this.sectionList = data;
   }

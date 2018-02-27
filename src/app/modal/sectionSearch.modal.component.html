@@ -100,7 +100,12 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let data of sectionList | slice: start: end">
+                    <!-- ::: 2018.02.27 [#41] ページング修正：部門モーダル Del Start newtouch -->
+                    <!-- ::: <tr *ngFor="let data of sectionList | slice: start: end"> -->
+                    <!-- ::: 2018.02.27 [#41] ページング修正：部門モーダル Del End   newtouch -->
+                    <!-- ::: 2018.02.27 [#41] ページング修正：部門モーダル Add Start newtouch -->
+                    <tr *ngFor="let data of sectionList">
+                    <!-- ::: 2018.02.27 [#41] ページング修正：部門モーダル Add End   newtouch -->
                       <td class="code-list">
                         <button type="button" class="btn btn-danger btn-mini" (click)="onSelect(data?.postCd, data?.sectionNm)">
                           選択
