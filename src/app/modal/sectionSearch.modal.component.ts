@@ -58,6 +58,13 @@ export class SectionSearchModalComponent {
     // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add End   newtouch
   }
 
+  // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add Start newtouch
+  // 表示ページを初期化する
+  initCurrentPage() {
+    this.currentPage = 1;
+  }
+  // ::: 2018.02.27 [#41] ページング修正：部門モーダル Add End   newtouch
+
   // モーダル表示
   openModal(modalTypeFromParent: any) {
     if (modalTypeFromParent) {
@@ -114,8 +121,8 @@ export class SectionSearchModalComponent {
         }
         // ::: 2018.02.27 [#41] ページング修正：部門モーダル Del Start newtouch
         // :::         this.currentPage = 1;
+        // :::         this.pageChanged(null); 
         // ::: 2018.02.27 [#41] ページング修正：部門モーダル Del End   newtouch
-        this.pageChanged(null);
         this.isLoading = false;
       },
       error => {

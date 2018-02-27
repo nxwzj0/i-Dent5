@@ -54,7 +54,7 @@ export class SetubiSearchModalComponent {
 
   // ページング処理
   pageChanged(event: any): void {
-    if(!(this.itemsPerPage > 0)){
+    if (!(this.itemsPerPage > 0)) {
       this.itemsPerPage = 10;
     }
     this.start = this.itemsPerPage * (this.currentPage - 1);
@@ -80,6 +80,11 @@ export class SetubiSearchModalComponent {
   clearSetubiSearch() {
     this.kijoNm = "";
     this.setubiNm = "";
+  }
+
+  // 表示ページを初期化する
+  initCurrentPage() {
+    this.currentPage = 1;
   }
 
   // 検索処理
