@@ -13,7 +13,6 @@
 <common-modal #common (commonEnter)="onEntry($event, iFile.files)"></common-modal>
 <common-modal #errorModal></common-modal>
 <incidentSearch-modal #incident (incidentSearchSelect)="onIncidentSearchSelected($event)"></incidentSearch-modal>
-<kijoSearch-modal #kijo></kijoSearch-modal>
 <userSearch-modal #salesUser (salesUserSelect)="onSalesUserSelected($event)"></userSearch-modal>
 <userSearch-modal #skanUser (salesUserSelect)="onSalesUserSelected($event)"></userSearch-modal>
 <userSearch-modal #callUser (salesUserSelect)="onSalesUserSelected($event)"></userSearch-modal>
@@ -26,25 +25,21 @@
 <sectionSearch-modal #actSection (salesSectionSelect)="onSalesSectionSelected($event)"></sectionSearch-modal>
 <projectSearch-modal #project (projectSearchSelect)="onProjectSearchSelected($event)"></projectSearch-modal>
 <!-- ::: 2018.02.05 [#35] 入力補助モーダル　取引先 Add Start newtouch -->
-<customerSearch-modal #customer (customerSearchSelect) = "onCustomerSearchSelected($event)"></customerSearch-modal>
+<customerSearch-modal #customer (customerSearchSelect)="onCustomerSearchSelected($event)"></customerSearch-modal>
 <!-- ::: 2018.02.05 [#35] 入力補助モーダル　取引先 Add End   newtouch -->
-<equipmentSearch-modal #equipment></equipmentSearch-modal>
+<setubiSearch-modal #setubi (setubiSelect)="onSetubiSelected($event)"></setubiSearch-modal>
 
 <div id="editApp">
   <div ng-controller="EditController as main" class="container-fluid">
-    <!--
-                <button onclick="onHrefLink('./IncidentEdit.php')">load</button>
-                <button ng-click="onHrefLink('./IncidentEdit.php')">load angular</button>
-                <button ng-click="main.test()">load angular</button>
-                -->
     <div class="text-right transition-button">
       <span>
-        <button type="button" class="btn btn-danger" (click)="common.openModal('確認','編集内容を登録します。宜しいですか？','OK','キャンセル')"
-        type="submit" value="登録">登録</button>
+        <button type="button" class="btn btn-danger" (click)="common.openModal('確認','編集内容を登録します。宜しいですか？','OK','キャンセル')" type="submit"
+          value="登録">登録</button>
         <!-- <button type="button" (click)="reset('all')" class="btn"> リセット</button> -->
       </span>
       <span>
-        <button type="button" class="btn btn-danger" routerLink="/detail/{{incidentId}}" routerLinkActive="current" [routerLinkActiveOptions]="{ exact: true }" *ngIf="incidentId">
+        <button type="button" class="btn btn-danger" routerLink="/detail/{{incidentId}}" routerLinkActive="current" [routerLinkActiveOptions]="{ exact: true }"
+          *ngIf="incidentId">
           閲覧へ戻る
         </button>
       </span>
@@ -61,7 +56,7 @@
           </div>
           <!-- /.panel-heading -->
           <div class="panel-body context-margin">
-            <form #myForm="ngForm" (ngSubmit)="show()" novalidate>
+            <form #myForm="ngForm" novalidate>
               <div class="row">
                 <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
                   <label>
@@ -71,16 +66,17 @@
                   </label>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                  <select #sel_incidentType="ngModel" name="sel_incidentType" class="form-control edit-dropdown" [(ngModel)]="incidentTypeCd" required>
+                  <select #sel_incidentType="ngModel" name="sel_incidentType" class="form-control edit-dropdown" [(ngModel)]="incidentTypeCd"
+                    required>
                     <option value=""></option>
                     <option *ngFor="let item of incidentTypeArray" [value]='item.value'>
                       {{item.label}}
                     </option>
                   </select>
-                  <span class="text-danger" *ngIf="sel_incidentType.errors?.required && sel_incidentType.dirty">
+                  <span class="text-danger" *ngIf="(sel_incidentType.errors?.required && sel_incidentType.dirty) || sel_incidentType_require_error">
                     インシデント分類は必須入力です。
                   </span>
-                </div> 
+                </div>
                 <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
                   <label>
                     <strong>親インシデント番号：</strong>
@@ -106,9 +102,8 @@
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
                   <div class="input-group">
-                    <input id="txt_incidentStartDate" name="txt_incidentStartDate" type="text" class="form-control" 
-                    #dpIncidentStartDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
-                      [(bsValue)]="incidentStartDate">
+                    <input id="txt_incidentStartDate" name="txt_incidentStartDate" type="text" class="form-control" #dpIncidentStartDate="bsDatepicker"
+                      bsDatepicker [bsConfig]="bsConfig" [(bsValue)]="incidentStartDate">
                     <span class="input-group-btn">
                       <button type="button" class="btn btn-input-support" (click)="dpIncidentStartDate.toggle()">
                         <i class="fa fa-calendar"></i>
@@ -167,8 +162,10 @@
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                   <input #txt_infoProvider="ngModel" name="txt_infoProvider" type="text" class="form-control" [(ngModel)]="infoProvider" maxlength="250">
+                  <!-- <input #txt_infoProvider="ngModel" name="txt_infoProvider" type="text" class="form-control" [(ngModel)]="infoProvider" maxlength="32"> -->
                   <span class="text-danger" *ngIf="txt_infoProvider.errors?.maxlength && txt_infoProvider.dirty">
                     情報提供者は、250文字まで入力可能です。
+                    <!-- 情報提供者は、32文字まで入力可能です。 -->
                   </span>
                 </div>
                 <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
@@ -177,9 +174,12 @@
                   </label>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                  <input #txt_infoProviderTel="ngModel" name="infoProvidedTel" type="text" class="form-control" [(ngModel)]="infoProvidedTel" maxlength="15">
+                  <input #txt_infoProviderTel="ngModel" name="infoProvidedTel" type="text" class="form-control" [(ngModel)]="infoProvidedTel"
+                    maxlength="15">
+                  <!-- <input #txt_infoProviderTel="ngModel" name="infoProvidedTel" type="text" class="form-control" [(ngModel)]="infoProvidedTel" maxlength="24"> -->
                   <span class="text-danger" *ngIf="txt_infoProviderTel.errors?.maxlength && txt_infoProviderTel.dirty">
                     情報提供TELは、15文字まで入力可能です。
+                    <!-- 情報提供TELは、24文字まで入力可能です。 -->
                   </span>
                 </div>
               </div>
@@ -190,34 +190,16 @@
                   </label>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                  <input #iFile name="incidentFile" type="file" [(ngModel)]="incidentFile">
-                </div>
-              </div>
-              <!-- <div class="row">
-                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
-                  <label>
-                    <strong>関係者：</strong>
-                  </label>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                  <div class="input-group">
-                    <input type="text" class="form-control">
-                    <span class="input-group-btn">
-                      <button type="button" class="btn btn-input-support">
-                        <i class="fa fa-user"></i>
-                      </button>
-                    </span>
-                  </div>
+                  <input #iFile name="incidentFile" type="file" [(ngModel)]="incidentFile" multiple="multiple">
                 </div>
               </div>
               <div class="row">
-                <div class="col-lg-offset-2 col-md-offset-3 col-sm-offset-3 col-xs-offset-3 col-lg-2 col-md-3 col-sm-3 col-xs-3">
-                  &nbsp;&nbsp;
-                  <a>
-                    <u>関係者を追加</u>
-                  </a>
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
                 </div>
-              </div> -->
+                <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9">
+                  <file-component #fileList></file-component>
+                </div>
+              </div>
               <div class="row">
                 <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
                   <label for="InputTextarea">
@@ -238,44 +220,14 @@
                 <div class="row">
                   <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
                     <label>
-                      <strong>機場：
-                        <span class="require">＊</span>
-                      </strong>
+                      <strong>機場：</strong>
                     </label>
                   </div>
                   <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9">
-                    <div class="input-group">
-                      <input #txt_kijoNm="ngModel" name="txt_kijoNm" type="text" class="form-control" [(ngModel)]="kijoNm" required readonly>
-                      <input name="hid_kijoId" type="hidden" [(ngModel)]="kijoId">
-                      <span class="input-group-btn">
-                        <button type="button" class="btn btn-input-support" (click)="kijo.openModal()">
-                          <i class="fa fa-industry"></i>
-                        </button>
-                      </span>
-                    </div>
-                    <span class="text-danger" *ngIf="txt_kijoNm.errors?.required && txt_kijoNm.dirty">
-                      機場は必須入力です。
-                    </span>
+                    <input #txt_kijoNm="ngModel" name="txt_kijoNm" type="text" class="form-control" [(ngModel)]="kijoNm" readonly>
+                    <input name="hid_kijoId" type="hidden" [(ngModel)]="kijoId">
                   </div>
                 </div>
-                <!-- <div class="row">
-                  <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
-                    <label>
-                      <strong>事業主体：</strong>
-                    </label>
-                  </div>
-                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                    <div class="input-group">
-                      <input name="jigyosyutaiNm" type="text" class="form-control" [(ngModel)]="jigyosyutaiNm">
-                      <input name="hid_jigyosyutaiId" type="hidden" [(ngModel)]="jigyosyutaiId">
-                      <span class="input-group-btn">
-                        <button type="button" class="btn btn-input-support">
-                          <i class="fa fa-building"></i>
-                        </button>
-                      </span>
-                    </div>
-                  </div>
-                </div> -->
                 <div class="row">
                   <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3">
                     <label>
@@ -303,13 +255,12 @@
                       <input #txt_setubiNm="ngModel" name="setubiNm" type="text" class="form-control" [(ngModel)]="setubiNm" required readonly>
                       <input name="hid_setubiId" type="hidden" [(ngModel)]="setubiId">
                       <span class="input-group-btn">
-                        <!-- <button type="button" class="btn btn-input-support"> -->
-                        <button type="button" class="btn btn-input-support" (click)="equipment.openModal()">
+                        <button type="button" class="btn btn-input-support" (click)="setubi.openModal()">
                           <i class="fa fa-cog"></i>
                         </button>
                       </span>
                     </div>
-                    <span class="text-danger" *ngIf="txt_setubiNm.errors?.required && txt_setubiNm.dirty">
+                    <span class="text-danger" *ngIf="(txt_setubiNm.errors?.required && txt_setubiNm.dirty) || txt_setubiNm_require_error">
                       設備は必須入力です。
                     </span>
                   </div>
@@ -321,7 +272,7 @@
                     </label>
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                    <select name="sel_prefId" class="form-control edit-dropdown" [(ngModel)]="prefId">
+                    <select name="sel_prefNm" class="form-control edit-dropdown" [(ngModel)]="prefNm">
                       <option value=""></option>
                       <option *ngFor="let item of prefArray" [value]='item.value'>
                         {{item.label}}
@@ -337,10 +288,8 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <div class="input-group">
-                      <input name="deliveryPjNm" type="text" class="form-control" [(ngModel)]="deliveryPjNm" readonly>
-                      <input name="hid_deliveryPjId" type="hidden" [(ngModel)]="deliveryPjId">
+                      <input name="txt_deliveryPjNo" type="text" class="form-control" [(ngModel)]="deliveryPjNo" readonly>
                       <span class="input-group-btn">
-                        <!-- <button type="button" class="btn btn-input-support"> -->
                         <button type="button" class="btn btn-input-support" (click)="project.openModal()">
                           <i class="fa fa-wrench"></i>
                         </button>
@@ -359,7 +308,6 @@
                       <input name="custNm" type="text" class="form-control" [(ngModel)]="custNm" readonly>
                       <input name="hid_cudtId" type="hidden" [(ngModel)]="custId">
                       <span class="input-group-btn">
-                        <!-- <button type="button" class="btn btn-input-support"> -->
                         <button type="button" class="btn btn-input-support" (click)="customer.openModal()">
                           <i class="fa fa-address-card-o"></i>
                         </button>
@@ -388,8 +336,10 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <input #txt_custDept="ngModel" name="custDept" type="text" class="form-control" [(ngModel)]="custDept" maxlength="100">
+                    <!-- <input #txt_custDept="ngModel" name="custDept" type="text" class="form-control" [(ngModel)]="custDept" maxlength="80"> -->
                     <span class="text-danger" *ngIf="txt_custDept.errors?.maxlength && txt_custDept.dirty">
                       会社名・所属部署は、100文字まで入力可能です。
+                      <!-- 会社名・所属部署は、80文字まで入力可能です。 -->
                     </span>
                   </div>
                   <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
@@ -399,8 +349,10 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <input #txt_requester="ngModel" name="requester" type="text" class="form-control" [(ngModel)]="requester" maxlength="250">
+                    <!-- <input #txt_requester="ngModel" name="requester" type="text" class="form-control" [(ngModel)]="requester" maxlength="20"> -->
                     <span class="text-danger" *ngIf="txt_requester.errors?.maxlength && txt_requester.dirty">
                       依頼者は、250文字まで入力可能です。
+                      <!-- 依頼者は、20文字まで入力可能です。 -->
                     </span>
                   </div>
                 </div>
@@ -412,8 +364,10 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <input #txt_contactTel="ngModel" name="contactTel" type="text" class="form-control" [(ngModel)]="contactTel" maxlength="15">
+                    <!-- <input #txt_contactTel="ngModel" name="contactTel" type="text" class="form-control" [(ngModel)]="contactTel" maxlength="24"> -->
                     <span class="text-danger" *ngIf="txt_contactTel.errors?.maxlength && txt_contactTel.dirty">
                       連絡先(TEL)は、15文字まで入力可能です。
+                      <!-- 連絡先(TEL)は、24文字まで入力可能です。 -->
                     </span>
                   </div>
                   <div class="col-lg-offset-2 col-lg-2 col-md-3 col-sm-3 col-xs-3">
@@ -423,8 +377,10 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <input #txt_contactFax="ngModel" name="contactFax" type="text" class="form-control" [(ngModel)]="contactFax" maxlength="15">
+                    <!-- <input #txt_contactFax="ngModel" name="contactFax" type="text" class="form-control" [(ngModel)]="contactFax" maxlength="14"> -->
                     <span class="text-danger" *ngIf="txt_contactFax.errors?.maxlength && txt_contactFax.dirty">
                       連絡先(FAX)は、15文字まで入力可能です。
+                      <!-- 連絡先(FAX)は、14文字まで入力可能です。 -->
                     </span>
                   </div>
                 </div>
@@ -436,8 +392,10 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <input #txt_contactMail="ngModel" name="contactMail" type="text" class="form-control" [(ngModel)]="contactMail" maxlength="50">
+                    <!-- <input #txt_contactMail="ngModel" name="contactMail" type="text" class="form-control" [(ngModel)]="contactMail" maxlength="64"> -->
                     <span class="text-danger" *ngIf="txt_contactFax.errors?.maxlength && txt_contactFax.dirty">
                       連絡先(E-mail)は、50文字まで入力可能です。
+                      <!-- 連絡先(E-mail)は、64文字まで入力可能です。 -->
                     </span>
                   </div>
                 </div>
@@ -614,8 +572,10 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <input #txt_callTel="ngModel" name="callTel" type="text" class="form-control" [(ngModel)]="callTel" maxlength="15">
+                    <!-- <input #txt_callTel="ngModel" name="callTel" type="text" class="form-control" [(ngModel)]="callTel" maxlength="14"> -->
                     <span class="text-danger" *ngIf="txt_callTel.errors?.maxlength && txt_callTel.dirty">
                       受付情報のTELは、15文字まで入力可能です。
+                      <!-- 受付情報のTELは、14文字まで入力可能です。 -->
                     </span>
                   </div>
                   <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
@@ -639,8 +599,9 @@
                     </label>
                   </div>
                   <div class="col-lg-10 col-md-10 col-sm-9 col-xs-9">
-                    <textarea #txt_callContent="ngModel" name="callContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="callContent" required maxlength="2000"></textarea>
-                    <span class="text-danger" *ngIf="txt_callContent.errors?.required && txt_callContent.dirty">
+                    <textarea #txt_callContent="ngModel" name="callContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="callContent"
+                      required maxlength="2000"></textarea>
+                    <span class="text-danger" *ngIf="(txt_callContent.errors?.required && txt_callContent.dirty) || txt_callContent_require_error">
                       受付内容は必須入力です。
                     </span>
                     <span class="text-danger" *ngIf="txt_callContent.errors?.maxlength && txt_callContent.dirty">
@@ -751,8 +712,10 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <input #txt_taioTel="ngModel" name="taioTel" type="text" class="form-control" [(ngModel)]="taioTel" maxlength="15">
+                    <!-- <input #txt_taioTel="ngModel" name="taioTel" type="text" class="form-control" [(ngModel)]="taioTel" maxlength="14"> -->
                     <span class="text-danger" *ngIf="txt_taioTel.errors?.maxlength && txt_taioTel.dirty">
                       対応情報のTELは、15文字まで入力可能です。
+                      <!-- 対応情報のTELは、14文字まで入力可能です。 -->
                     </span>
                   </div>
                   <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
@@ -774,7 +737,8 @@
                     </label>
                   </div>
                   <div class="col-lg-10 col-md-10 col-sm-9 col-xs-9">
-                    <textarea #txt_taioContent="ngModel" name="taioContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="taioContent" maxlength="2000"></textarea>
+                    <textarea #txt_taioContent="ngModel" name="taioContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="taioContent"
+                      maxlength="2000"></textarea>
                     <span class="text-danger" *ngIf="txt_taioContent.errors?.maxlength && txt_taioContent.dirty">
                       対応内容は、2000文字まで入力可能です。
                     </span>
@@ -793,7 +757,8 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <div class="input-group">
-                      <input id="txt_actDate" name="txt_actDate" type="text" class="form-control" #dpActDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig" [(bsValue)]="actDate">
+                      <input id="txt_actDate" name="txt_actDate" type="text" class="form-control" #dpActDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
+                        [(bsValue)]="actDate">
                       <span class="input-group-btn">
                         <button type="button" class="btn btn-input-support" (click)="dpActDate.toggle();">
                           <i class="fa fa-calendar"></i>
@@ -826,8 +791,8 @@
                   </div>
                   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
                     <div class="input-group">
-                      <input id="txt_actStartDate" name="txt_actStartDate" type="text" class="form-control" #dpActStartDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
-                        [(bsValue)]="actStartDate">
+                      <input id="txt_actStartDate" name="txt_actStartDate" type="text" class="form-control" #dpActStartDate="bsDatepicker" bsDatepicker
+                        [bsConfig]="bsConfig" [(bsValue)]="actStartDate">
                       <span class="input-group-btn">
                         <button type="button" class="btn btn-input-support" (click)="dpActStartDate.toggle();">
                           <i class="fa fa-calendar"></i>
@@ -858,8 +823,8 @@
                   </div>
                   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
                     <div class="input-group">
-                      <input id="txt_actEndDate" name="txt_actEndDate" type="text" class="form-control" #dpActEndDate="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
-                        [(bsValue)]="actEndDate">
+                      <input id="txt_actEndDate" name="txt_actEndDate" type="text" class="form-control" #dpActEndDate="bsDatepicker" bsDatepicker
+                        [bsConfig]="bsConfig" [(bsValue)]="actEndDate">
                       <span class="input-group-btn">
                         <button type="button" class="btn btn-input-support" (click)="dpActEndDate.toggle();">
                           <i class="fa fa-calendar"></i>
@@ -922,8 +887,10 @@
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <input #txt_actTel="ngModel" name="actTel" type="text" class="form-control" [(ngModel)]="actTel" maxlength="15">
+                    <!-- <input #txt_actTel="ngModel" name="actTel" type="text" class="form-control" [(ngModel)]="actTel" maxlength="14"> -->
                     <span class="text-danger" *ngIf="txt_actTel.errors?.maxlength && txt_actTel.dirty">
                       処置情報のTELは、15文字まで入力可能です。
+                      <!-- 処置情報のTELは、14文字まで入力可能です。 -->
                     </span>
                   </div>
                   <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
@@ -945,7 +912,8 @@
                     </label>
                   </div>
                   <div class="col-lg-10 col-md-10 col-sm-9 col-xs-9">
-                    <textarea #txt_actContent="ngModel" name="actContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="actContent" maxlength="2000"></textarea>
+                    <textarea #txt_actContent="ngModel" name="actContent" class="form-control" id="InputTextarea" rows="4" [(ngModel)]="actContent"
+                      maxlength="2000"></textarea>
                     <span class="text-danger" *ngIf="txt_actContent.errors?.maxlength && txt_actContent.dirty">
                       処置結果は、2000文字まで入力可能です。
                     </span>
@@ -957,19 +925,45 @@
                 <strong>製品情報</strong>
               </h5>
               <div class="product-info-border">
+                <h5 class="context-sub-header">
+                  <strong>対象機種区分</strong>
+                </h5>
                 <div class="row">
                   <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>　装置分類：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_sotiKbnCd" class="form-control edit-dropdown" [(ngModel)]="sotiKbnCd" (change)="findKisyuList()">
+                      <option value=""></option>
+                      <option *ngFor="let item of sotiList" [value]='item.sotiCd'>
+                        {{item.sotiNm}}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-lg-offset-2 col-md-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-3">
                     <label>
                       <strong>機種区分：</strong>
                     </label>
                   </div>
-                  <div class="col-lg-10 col-md-10 col-sm-9 col-xs-9">
-                    <select name="sel_productTypeCd" class="form-control edit-dropdown" [(ngModel)]="productTypeCd">
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <select name="sel_kisyuKbnCd" class="form-control edit-dropdown" [(ngModel)]="kisyuKbnCd">
                       <option value=""></option>
-                      <option *ngFor="let item of productTypeArray" [value]='item.value'>
-                        {{item.label}}
+                      <option *ngFor="let item of kisyuList" [value]='item.kisyuCd'>
+                        {{item.kisyuNm}}
                       </option>
                     </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                    <label>
+                      <strong>　機種名：</strong>
+                    </label>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <input #txt_kisyuNm="ngModel" name="kisyuNm" type="text" class="form-control" [(ngModel)]="kisyuNm">
                   </div>
                 </div>
                 <h5 class="context-sub-header">
@@ -1051,222 +1045,25 @@
               </strong>
             </h5>
             <div class="context-margin">
-<!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add Start newtouch -->
+              <!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add Start newtouch -->
               <ul *ngFor="let dept of relateUserList;let deptIdx = index;" style="list-style:none;padding-left: 0px;">
                 <div>{{dept.relateUserSectionNm}}</div>
                 <li *ngFor="let user of dept.relateUsers;let userIdx = index;">
                   <div style="width:235px;display: inline-block;">
-                    <span class="context-margin relate-user-nm"> 
-                      {{user.relateUserNm}} 
+                    <span class="context-margin relate-user-nm">
+                      {{user.relateUserNm}}
                       <span *ngIf="user.kidokuDate != ''">（既読日：{{user.kidokuDate}}）</span>
                     </span>
                   </div>
                 </li>
               </ul>
-<!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add End   newtouch -->
+              <!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add End   newtouch -->
             </div>
           </div>
           <!-- /.panel-body -->
         </div>
         <!-- /.panel -->
 
-        <h4 class="panel-header text-primary">
-          <strong>▼関連リンク</strong>
-        </h4>
-        <div class="panel panel-default">
-          <div class="panel-body context-margin">
-            <h5 class="context-header">
-              <strong>プロジェクト情報
-                <span class="text-danger">※プロジェクト情報はＡＲＣＳから行なってください。（ＡＲＣＳ登録後の翌日反映）</span>
-              </strong>
-            </h5>
-            <div class="context-margin">
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>プロジェクト番号：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <a (click)="showPj()">
-                    <u>J1000000</u>
-                  </a>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>PJ主管部門：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">プロ主管</div>
-              </div>
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>プロジェクト名：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>PM：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">川本　健</div>
-              </div>
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>代表機場：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>都道府県：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">東京都</div>
-              </div>
-            </div>
-            <h5 class="context-header">
-              <strong>障害対応報告書(MR2)</strong>
-            </h5>
-            <div *ngFor="let data of MR2List" class="context-margin">
-              <a (click)="showMr2(data?.mkbid)">
-                <u *ngIf="data?.subjectNm.length > 0">{{data?.subjectNm}}</u>
-                <u *ngIf="data?.subjectNm.length == 0">（件名なし）</u>
-              </a>
-              <div class="context-margin">
-                <div class="row">
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                    <strong>作成日：</strong>
-                  </div>
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.makeDate | date:'yyyy/MM/dd'}}</div>
-                </div>
-                <div class="row">
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                    <strong>依頼元：</strong>
-                  </div>
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.requestUserNm}}</div>
-                </div>
-                <div class="row">
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                    <strong>作業担当者：</strong>
-                  </div>
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.workUserNm}}</div>
-                </div>
-              </div>
-            </div>
-            <h5 class="context-header">
-              <strong>労災・事故・クレーム連絡</strong>
-            </h5>
-            <div class="context-margin">
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>状態：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">第1報 正式発行</div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>区分：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">品質（ランクＡ）</div>
-              </div>
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>概要：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <a (click)="showJiko()">
-                    <u>XXXXXXXXXXXXXXXXXXXXXX</u>
-                  </a>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>顧客名：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">川本　健</div>
-              </div>
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>機場名：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
-              </div>
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>発行日：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">2017/1/1</div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>発行元：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
-              </div>
-            </div>
-            <h5 class="context-header">
-              <strong>費用決済申請</strong>
-            </h5>
-            <div class="context-margin">
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>ID番号：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <a (click)="showHiyo('dsp','dsp',416161,'','1282')">
-                    <u>XXXXXXXXXX</u>
-                  </a>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>ステータス：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">決裁</div>
-              </div>
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>区分：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">クレーム対応</div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>決裁番号：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">無償 第X号</div>
-              </div>
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>件名：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">XXXXXXXXXXXXXXXXXXXXXX</div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>概算金額：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <div class="pull-right">123,456</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- /.panel-body -->
-        </div>
-        <!-- /.panel -->
-
-        <h4 class="panel-header text-primary">
-          <strong>▼関連インシデント</strong>
-        </h4>
-        <div class="panel panel-default">
-          <div class="panel-body context-margin">
-            <h5 class="context-header">
-              <strong>同一機場インシデント</strong>
-            </h5>
-            <div class="context-margin" *ngFor="let jikoIdList of relateIncidentKijoIdList">
-              <a (click)="showRelateIncident(jikoIdList?.relateIncidentId)">
-                <u>#{{jikoIdList.relateIncidentNo}} {{jikoIdList.relateIncidentType}} {{jikoIdList.relateIncidentStartDateTime}} {{jikoIdList.relateIncidentKijoNm}} {{jikoIdList.relateIncidentCustNm}}</u>
-              </a>
-              <div class="context-margin">
-                {{jikoIdList.relateIncidentContent}}
-              </div>
-            </div>
-            <h5 class="context-header">
-              <strong>同一顧客インシデント</strong>
-            </h5>
-            <div class="context-margin" *ngFor="let custIdList of relateIncidentCustIdList">
-              <a (click)="showRelateIncident(custIdList?.relateIncidentId)">
-                <u>#{{custIdList.relateIncidentNo}} {{custIdList.relateIncidentType}} {{custIdList.relateIncidentStartDateTime}} {{custIdList.relateIncidentKijoNm}} {{custIdList.relateIncidentCustNm}}</u>
-              </a>
-              <div class="context-margin">
-                {{custIdList.relateIncidentContent}}
-              </div>
-            </div>
-          </div>
-          <!-- /.panel-body -->
-        </div>
-        <!-- /.panel -->
       </div>
     </div>
     <!-- /.row -->

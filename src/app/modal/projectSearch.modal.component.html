@@ -94,7 +94,7 @@
                 firstText="&laquo;" lastText="&raquo;" (click)="pageChanged($event)"></pagination>
             </div>
             <div class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-4">
-              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged()"> 件/頁
+              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged(null)"> 件/頁
             </div>
           </div>
 
@@ -112,7 +112,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let data of projList | slice: start: end">
+                    <tr *ngFor="let data of projList">
                       <td class="code-list">
                         <button type="button" class="btn btn-danger btn-mini" (click)="onSelect(data?.pjId, data?.pjNo,data?.summaryNm)">
                           選択

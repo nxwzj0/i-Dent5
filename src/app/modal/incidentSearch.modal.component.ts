@@ -5,9 +5,18 @@ import { URLSearchParams } from '@angular/http';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 
+// datepikerの設定
+import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { listLocales } from 'ngx-bootstrap/chronos';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { jaLocale } from 'ngx-bootstrap/locale';
+
 import { JsonpService } from '../jsonp.service';
 
 import { LoadingComponent } from "../loading/loading.component";
+
+// datepikerの設定
+defineLocale('ja', jaLocale);
 
 @Component({
   selector: 'incidentSearch-modal',
@@ -22,7 +31,11 @@ export class IncidentSearchModalComponent {
   // インシデント検索イベント
   @Output() incidentSearchSelect: EventEmitter<any> = new EventEmitter();
 
-  constructor(private modalService: BsModalService, private jsonpService: JsonpService) { }
+  constructor(private modalService: BsModalService, private jsonpService: JsonpService, private _localeService: BsLocaleService) {
+    // datepikerの設定
+    this.bsConfig = Object.assign({}, { dateInputFormat: 'YYYY/MM/DD' });
+    this._localeService.use(this.locale);
+  }
 
   isLoading: boolean = false;
 
@@ -42,6 +55,8 @@ export class IncidentSearchModalComponent {
   searchIncidentStatusCall = "";
   searchIncidentStatusTaio = "";
   searchIncidentStatusAct = "";
+  kijoNm = "";
+  prefNm = null;
 
   // ページングの設定
   maxSize: number = 5; // ページングの表示ページ数
@@ -84,38 +99,15 @@ export class IncidentSearchModalComponent {
     this.searchIncidentStatusCall = "";
     this.searchIncidentStatusTaio = "";
     this.searchIncidentStatusAct = "";
+    this.kijoNm = "";
+    this.prefNm = null;
   }
 
   checkDateShowCallStartDateFrom = false; //受付日（FROM）(日付型チェック)
   checkDateShowCallStartDateTo = false; //受付日（TO）(日付型チェック)
 
-  // 日付型値の日付型チェック
-  checkDate() {
-    
-    this.checkShowInit();
-    var result = true; // 返り値
-
-    // 受付日（FROM）
-    var callStartDateFromValue = (<HTMLInputElement>document.getElementById('txt_callStartDateFrom')).value;
-    var searchCallStartDateFromStr = this.getDateStringFromDate(this.searchCallStartDateFrom);
-    if (searchCallStartDateFromStr == null && callStartDateFromValue != "") {
-      this.checkDateShowCallStartDateFrom = true;
-      result = false;
-    }
-
-    // 受付日（TO）
-    var callStartDateToValue = (<HTMLInputElement>document.getElementById('txt_callStartDateTo')).value;
-    var searchCallStartDateToStr = this.getDateStringFromDate(this.searchCallStartDateTo);
-    if (searchCallStartDateToStr == null && callStartDateToValue != "") {
-      this.checkDateShowCallStartDateTo = true;
-      result = false;
-    }
-
-    return result;
-  }
-
   // 初期化エラーメッセージ
-  checkShowInit(){
+  checkShowInit() {
     this.checkDateShowCallStartDateFrom = false; //受付日（FROM）(日付型チェック)
     this.checkDateShowCallStartDateTo = false; //受付日（TO）(日付型チェック)
   }
@@ -143,6 +135,10 @@ export class IncidentSearchModalComponent {
       ps.set("incidentStatusCall", this.searchIncidentStatusCall);
       ps.set("incidentStatusTaio", this.searchIncidentStatusTaio);
       ps.set("incidentStatusAct", this.searchIncidentStatusAct);
+      ps.set("incidentStatusAct", this.searchIncidentStatusAct);
+      ps.set("incidentStatusAct", this.searchIncidentStatusAct);
+      ps.set("kijoNm", this.kijoNm);
+      ps.set("prefNm", this.prefNm);
 
       // 検索
       this.isLoading = true;
@@ -150,9 +146,6 @@ export class IncidentSearchModalComponent {
         .subscribe(
         data => {
           // 通信成功時
-          console.group("IncidentSearchModalComponent.search() success");
-          console.log(data);
-          console.groupEnd();
           if (data[0]) {
             let list = data[0];
             if (list.result !== '' && list.result == true) {
@@ -166,10 +159,7 @@ export class IncidentSearchModalComponent {
         },
         error => {
           // 通信失敗もしくは、コールバック関数内でエラー
-          console.group("IncidentSearchModalComponent.search() fail");
           console.log('サーバとのアクセスに失敗しました。');
-          console.log(error);
-          console.groupEnd();
           this.isLoading = false;
           return false;
         }
@@ -187,6 +177,12 @@ export class IncidentSearchModalComponent {
     this.incidentList = data;
   }
 
+  // date pikerの設定
+  bsValue: Date;
+  locale = 'ja';
+  locales = listLocales();
+  bsConfig: Partial<BsDatepickerConfig>;
+
   // 選択ボタンクリック
   onSelect(incidentId: any, incidentNo: any) {
     // インシデント情報 
@@ -197,21 +193,56 @@ export class IncidentSearchModalComponent {
 
   // 日付型を日付フォーマット文字列に変更
   getDateStringFromDate(date) {
-
     if (date && date.getFullYear()) {
       var y: number = date.getFullYear();
       var m: number = date.getMonth();
       m++;
       var d: number = date.getDate();
-      // 2018.01.20 Newtouch更新 start
-      // return  y + "-" + m + "-" + d + " 00:00:00";
-      return y + "-" + m + "-" + d;
-      // 2018.01.20 Newtouch更新 end
+      if (y) {
+        var yStr = ('00' + y).slice(-4);
+      }
+      if (m) {
+        var mStr = ('00' + m).slice(-2);
+      }
+      if (d) {
+        var dStr = ('00' + d).slice(-2);
+      }
+      if (yStr && mStr && dStr) {
+        return yStr + "/" + mStr + "/" + dStr + " 00:00:00";
+      } else {
+        // 日付型でない値の場合
+        return null;
+      }
+
     } else {
       // 日付型でない値の場合
       return null;
     }
+  }
 
+  // 日付型値の日付型チェック
+  checkDate() {
+
+    this.checkShowInit();
+    var result = true; // 返り値
+
+    // 受付日（FROM）
+    var callStartDateFromValue = (<HTMLInputElement>document.getElementById('txt_callStartDateFrom')).value;
+    var searchCallStartDateFromStr = this.getDateStringFromDate(this.searchCallStartDateFrom);
+    if (searchCallStartDateFromStr == null && callStartDateFromValue != "") {
+      this.checkDateShowCallStartDateFrom = true;
+      result = false;
+    }
+
+    // 受付日（TO）
+    var callStartDateToValue = (<HTMLInputElement>document.getElementById('txt_callStartDateTo')).value;
+    var searchCallStartDateToStr = this.getDateStringFromDate(this.searchCallStartDateTo);
+    if (searchCallStartDateToStr == null && callStartDateToValue != "") {
+      this.checkDateShowCallStartDateTo = true;
+      result = false;
+    }
+
+    return result;
   }
 
 }

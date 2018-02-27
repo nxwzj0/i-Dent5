@@ -3,7 +3,6 @@
 //	システム名　　　：インシデント管理システム
 //	サブシステム名　：
 //	画面名　　　　　：インシデント一覧画面
-//	HTML_ID　　　　：IncidentListView.php
 //	作成日付・作成者：2017.10.05 ADF)S.Yoshida
 //	修正履歴　　　　：
 //*****************************************************************************
@@ -47,26 +46,6 @@
       </div>
     </div> -->
     <form>
-      <!-- 仕様検討中のためコメント -->
-      <!--
-                    <div class="row">
-                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 label-padding">
-                            <div class="row">
-                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
-                                    <button class="btn btn-danger btn-close">&times;</button>
-                                </div>
-                                <div class=""></div>
-                                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
-                                    キーワード
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                            <input type="text" class="form-control" value="">
-                        </div>
-                    </div>
-                    -->
-
       <div class="row" *ngIf="showKeywordFlg">
         <span>
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 label-padding">
@@ -153,11 +132,11 @@
       </div>
 
       <div class="row" *ngIf="!showKeywordFlg">
-        <span [class.condition-show]="prefCdShow" [class.condition-hide]="!prefCdShow">
+        <span [class.condition-show]="prefNmShow" [class.condition-hide]="!prefNmShow">
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 label-padding">
             <div class="row">
               <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
-                <button type="button" (click)="searchHide('prefCd');searchClear('prefCd');" class="btn btn-danger btn-close">&times;</button>
+                <button type="button" (click)="searchHide('prefNm');searchClear('prefNm');" class="btn btn-danger btn-close">&times;</button>
               </div>
               <div class=""></div>
               <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
@@ -166,55 +145,55 @@
             </div>
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-            <select name="sel_PrefCd" class="form-control search-dropdown" [(ngModel)]="prefCd">
-              <option value="0">検索項目を選択</option>
-              <option value="1">北海道</option>
-              <option value="2">青森県</option>
-              <option value="3">岩手県</option>
-              <option value="4">宮城県</option>
-              <option value="5">秋田県</option>
-              <option value="6">山形県</option>
-              <option value="7">福島県</option>
-              <option value="8">茨城県</option>
-              <option value="9">栃木県</option>
-              <option value="10">群馬県</option>
-              <option value="11">埼玉県</option>
-              <option value="12">千葉県</option>
-              <option value="13">東京都</option>
-              <option value="14">神奈川県</option>
-              <option value="15">新潟県</option>
-              <option value="16">富山県</option>
-              <option value="17">石川県</option>
-              <option value="18">福井県</option>
-              <option value="19">山梨県</option>
-              <option value="20">長野県</option>
-              <option value="21">岐阜県</option>
-              <option value="22">静岡県</option>
-              <option value="23">愛知県</option>
-              <option value="24">三重県</option>
-              <option value="25">滋賀県</option>
-              <option value="26">京都府</option>
-              <option value="27">大阪府</option>
-              <option value="28">兵庫県</option>
-              <option value="29">奈良県</option>
-              <option value="30">和歌山県</option>
-              <option value="31">鳥取県</option>
-              <option value="32">島根県</option>
-              <option value="33">岡山県</option>
-              <option value="34">広島県</option>
-              <option value="35">山口県</option>
-              <option value="36">徳島県</option>
-              <option value="37">香川県</option>
-              <option value="38">愛媛県</option>
-              <option value="39">高知県</option>
-              <option value="40">福岡県</option>
-              <option value="41">佐賀県</option>
-              <option value="42">長崎県</option>
-              <option value="43">熊本県</option>
-              <option value="44">大分県</option>
-              <option value="45">宮崎県</option>
-              <option value="46">鹿児島県</option>
-              <option value="47">沖縄県</option>
+            <select name="sel_PrefNm" class="form-control search-dropdown" [(ngModel)]="prefNm">
+              <option value=""></option>
+              <option value="北海道">北海道</option>
+              <option value="青森県">青森県</option>
+              <option value="岩手県">岩手県</option>
+              <option value="宮城県">宮城県</option>
+              <option value="秋田県">秋田県</option>
+              <option value="山形県">山形県</option>
+              <option value="福島県">福島県</option>
+              <option value="茨城県">茨城県</option>
+              <option value="栃木県">栃木県</option>
+              <option value="群馬県">群馬県</option>
+              <option value="埼玉県">埼玉県</option>
+              <option value="千葉県">千葉県</option>
+              <option value="東京都">東京都</option>
+              <option value="神奈川県">神奈川県</option>
+              <option value="新潟県">新潟県</option>
+              <option value="富山県">富山県</option>
+              <option value="石川県">石川県</option>
+              <option value="福井県">福井県</option>
+              <option value="山梨県">山梨県</option>
+              <option value="長野県">長野県</option>
+              <option value="岐阜県">岐阜県</option>
+              <option value="静岡県">静岡県</option>
+              <option value="愛知県">愛知県</option>
+              <option value="三重県">三重県</option>
+              <option value="滋賀県">滋賀県</option>
+              <option value="京都府">京都府</option>
+              <option value="大阪府">大阪府</option>
+              <option value="兵庫県">兵庫県</option>
+              <option value="奈良県">奈良県</option>
+              <option value="和歌山県">和歌山県</option>
+              <option value="鳥取県">鳥取県</option>
+              <option value="島根県">島根県</option>
+              <option value="岡山県">岡山県</option>
+              <option value="広島県">広島県</option>
+              <option value="山口県">山口県</option>
+              <option value="徳島県">徳島県</option>
+              <option value="香川県">香川県</option>
+              <option value="愛媛県">愛媛県</option>
+              <option value="高知県">高知県</option>
+              <option value="福岡県">福岡県</option>
+              <option value="佐賀県">佐賀県</option>
+              <option value="長崎県">長崎県</option>
+              <option value="熊本県">熊本県</option>
+              <option value="大分県">大分県</option>
+              <option value="宮崎県">宮崎県</option>
+              <option value="鹿児島県">鹿児島県</option>
+              <option value="沖縄県">沖縄県</option>
             </select>
           </div>
         </span>
@@ -566,23 +545,24 @@
               <div class="form-group">
                 <select name="sel_Condition" #condition class="form-control search-dropdown" [(ngModel)]="selCondition">
                   <option value="0">検索項目を選択</option>
-                  <option [class.condition-hide]="incidentNoShow" value="incidentNoShow">インシデント番号</option>
-                  <option [class.condition-hide]="callContentShow" value="callContentShow">受付内容</option>
-                  <option [class.condition-hide]="parentIncidentNoShow" value="parentIncidentNoShow">親インシデント番号</option>
-                  <option [class.condition-hide]="incidentStartDateTimeShow" value="incidentStartDateTimeShow">発生日時</option>
-                  <option [class.condition-hide]="callDateShow" value="callDateShow">受付日</option>
-                  <option [class.condition-hide]="industryTypeShow" value="industryTypeShow">業種区分</option>
-                  <option [class.condition-hide]="kijoNmShow" value="kijoNmShow">機場</option>
-                  <option [class.condition-hide]="jigyosyutaiNmShow" value="jigyosyutaiNmShow">事業主体</option>
-                  <option [class.condition-hide]="setubiNmShow" value="setubiNmShow">設備</option>
-                  <option [class.condition-hide]="prefCdShow" value="prefCdShow">都道府県</option>
-                  <option [class.condition-hide]="custNmShow" value="custNmShow">顧客</option>
-                  <option [class.condition-hide]="custTypeShow" value="custTypeShow">顧客分類</option>
-                  <option [class.condition-hide]="salesDeptNmShow" value="salesDeptNmShow">営業部門</option>
-                  <option [class.condition-hide]="salesUserNmShow" value="salesUserNmShow">営業担当者</option>
-                  <option [class.condition-hide]="relateUserNmShow" value="relateUserNmShow">関係者</option>
-                  <option [class.condition-hide]="incidentTypeShow" value="incidentTypeShow">インシデント分類</option>
-                  <option [class.condition-hide]="incidentStsShow" value="incidentStsShow">ステータス</option>
+                  <!-- <option [class.condition-hide]="incidentNoShow" value="incidentNoShow">インシデント番号</option> -->
+                  <option *ngIf="!incidentNoShow" value="incidentNoShow">インシデント番号</option>
+                  <option *ngIf="!callContentShow" value="callContentShow">受付内容</option>
+                  <option *ngIf="!parentIncidentNoShow" value="parentIncidentNoShow">親インシデント番号</option>
+                  <option *ngIf="!incidentStartDateTimeShow" value="incidentStartDateTimeShow">発生日時</option>
+                  <option *ngIf="!callDateShow" value="callDateShow">受付日</option>
+                  <option *ngIf="!industryTypeShow" value="industryTypeShow">業種区分</option>
+                  <option *ngIf="!kijoNmShow" value="kijoNmShow">機場</option>
+                  <option *ngIf="!jigyosyutaiNmShow" value="jigyosyutaiNmShow">事業主体</option>
+                  <option *ngIf="!setubiNmShow" value="setubiNmShow">設備</option>
+                  <option *ngIf="!prefNmShow" value="prefNmShow">都道府県</option>
+                  <option *ngIf="!custNmShow" value="custNmShow">顧客</option>
+                  <option *ngIf="!custTypeShow" value="custTypeShow">顧客分類</option>
+                  <option *ngIf="!salesDeptNmShow" value="salesDeptNmShow">営業部門</option>
+                  <option *ngIf="!salesUserNmShow" value="salesUserNmShow">営業担当者</option>
+                  <option *ngIf="!relateUserNmShow" value="relateUserNmShow">関係者</option>
+                  <option *ngIf="!incidentTypeShow" value="incidentTypeShow">インシデント分類</option>
+                  <option *ngIf="!incidentStsShow" value="incidentStsShow">ステータス</option>
                 </select>
               </div>
             </div>
@@ -605,7 +585,7 @@
             <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 transition-button text-right">
               <button type="button" (click)="excelOutput()" class="btn btn-warning">
                 <i class="fa fa-download"></i> EXCEL出力</button>
-              <button type="button" (click)="searchClear('all')" class="btn"> リセット</button>
+              <button type="button" (click)="searchClear('all')" class="btn btn-danger"> リセット</button>
               <button type="button" (click)="search()" class="btn btn-danger" *ngIf="!showKeywordFlg">
                 <i class="fa fa-search"></i> 検索</button>
               <button type="button" (click)="searchByKeyword()" class="btn btn-danger" *ngIf="showKeywordFlg">
@@ -622,7 +602,7 @@
             firstText="&laquo;" lastText="&raquo;" (click)="pageChanged($event)"></pagination>
         </div>
         <div class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-4 text-right">
-          <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged()"> 件/頁
+          <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged(null)"> 件/頁
         </div>
       </div>
 
@@ -652,7 +632,7 @@
                 <th class="table-header-list" (click)='sort("incidentStartDateTime")'>発生日時
                   <!-- <i class="fa" [class.fa-caret-up]="orderByParamArray['incidentStartDateTimeAsc']" [class.fa-caret-down]="orderByParamArray['incidentStartDateTimeDesc']"></i> -->
                 </th>
-                <th class="table-header-list" (click)='sort("callDate")'>受付日
+                <th class="table-header-list" (click)='sort("callDate")'>受付日<i class="fa fa-caret-down"></i>
                   <!-- <i class="fa" [class.fa-caret-up]="orderByParamArray['callDateAsc']" [class.fa-caret-down]="orderByParamArray['callDateDesc']"></i> -->
                 </th>
                 <th class="table-header-list" (click)='sort("incidentTypeNm")'>分類
@@ -683,7 +663,7 @@
                     <u>{{data?.incidentNo}}</u>
                   </a>
                 </td>
-                <td class="char-list" popover={{data?.callContent}} triggers="mouseenter:mouseleave">
+                <td class="char-list" title={{data?.callContent}}>
                   {{data?.callContent | slice: 0:40 }}
                   <span *ngIf="data?.callContent?.length >= 40">…</span>
                 </td>

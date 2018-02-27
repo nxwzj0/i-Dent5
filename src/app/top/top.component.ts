@@ -16,13 +16,17 @@ import { LoadingComponent } from "../loading/loading.component";
 })
 export class TopComponent implements OnInit, OnDestroy {
 
-  user;
+  userId;
+  userNm;
+  userSectionCd;
+  userSectionNm;
   subscription: Subscription;
   constructor(private route: ActivatedRoute, private jsonpService: JsonpService, private loginService: LoginService) {
     /* ログイン情報の取得 */
-    this.subscription = loginService.loginUser$.subscribe(
-      user => { this.user = user; }
-    );
+    this.subscription = loginService.loginUserId$.subscribe(user => { this.userId = user; });
+    this.subscription = loginService.loginUserNm$.subscribe(user => { this.userNm = user; });
+    this.subscription = loginService.loginUserSectionCd$.subscribe(user => { this.userSectionCd = user; });
+    this.subscription = loginService.loginUserSectionNm$.subscribe(user => { this.userSectionNm = user; });
   }
 
   isLoading: boolean = true;

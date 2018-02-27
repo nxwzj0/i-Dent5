@@ -175,3 +175,8 @@ body {
 input.ng-dirty.ng-invalid { 
     background-color: #fee; 
 }
+
+/* 一覧表示　数字（金額など） */
+.numbers-list{
+    text-align: right;
+}

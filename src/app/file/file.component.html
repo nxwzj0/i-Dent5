@@ -1,0 +1,24 @@
+<!--
+//*****************************************************************************
+//	システム名　　　：インシデント管理システム
+//	サブシステム名　：
+//	画面名　　　　　：ファイル画面
+//	作成日付・作成者：2018.02.24 ADF)S.Yoshida
+//	修正履歴　　　　：
+//*****************************************************************************
+-->
+<common-modal #fileCommon (commonEnter)="fileDelete()"></common-modal>
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div *ngFor="let data of fileList">
+      <div>
+        <a (click)="fileDownload(data?.fileId)">
+          <u>{{data?.fileNm}}</u>
+        </a>
+        <button type="button" class="btn btn-sx-ori btn-danger btn-close" (click)="setDeleteFileId(data?.fileId);fileCommon.openModal('確認','ファイルを削除します。宜しいですか？','OK','キャンセル')">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

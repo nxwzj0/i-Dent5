@@ -3,7 +3,6 @@
 //	システム名　　　：インシデント管理システム
 //	サブシステム名　：
 //	画面名　　　　　：インシデント閲覧画面
-//	HTMLID　　　　 ：IncidentDetailView.php
 //	作成日付・作成者：2017.10.05 ADF)S.Yoshida
 //	修正履歴　　　　：
 //*****************************************************************************
@@ -11,8 +10,8 @@
 <loading [loading]="isLoading"></loading>
 <my-header></my-header>
 <relateUserAdd-modal #relateUser (relateUserSelect)="onRelateUserSelected($event)"></relateUserAdd-modal>
-<common-modal #common (commonEnter)="donothing()"></common-modal>
 <common-modal #relateUserCommon (commonEnter)="relateUserDelete()"></common-modal>
+<btn-modal #btnModal (commonEnter1)="newHiyo('ins','','','','1281')" (commonEnter2)="newHiyo('ins','','','','1282')"></btn-modal>
 
 <div ng-cloak>
   <div class="container-fluid">
@@ -21,7 +20,7 @@
         <button type="button" class="btn btn-warning">事故／クレーム連絡登録</button>
       </span>
       <span>
-        <button type="button" class="btn btn-warning" (click)="newHiyo('dsp','dsp',416161,'','1282')">費用決済申請登録</button>
+        <button type="button" class="btn btn-warning" (click)="btnModal.openModal('確認', '費用決済申請の申請区分を選択してください。', '障害対応費用決済申請', 'クレーム対応費用決済申請', '閉じる')">費用決裁申請登録</button>
       </span>
       <span>
         <button type="button" class="btn btn-danger" routerLink="/edit/{{incidentId}}" routerLinkActive="current" [routerLinkActiveOptions]="{ exact: true }">
@@ -82,7 +81,7 @@
                 <strong>添付ファイル：</strong>
               </div>
               <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">
-                {{incidentFileNm}}
+                <!-- {{incidentFileNm}} -->
               </div>
             </div>
             <!-- <div class="row">
@@ -134,7 +133,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>納入プロジェクト：</strong>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{deliveryPjNm}}</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{deliveryPjNo}}</div>
               </div>
               <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
@@ -320,11 +319,30 @@
               <strong>製品情報</strong>
             </h5>
             <div class="product-info-border">
+              <h5 class="context-sub-header">
+                <strong>対象機種区分</strong>
+              </h5>
               <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6">
+                  <strong>　装置分類：</strong>
+                </div>
+                <div class="col-lg-4 col-md-3 col-sm-6 col-xs-6">
+                  {{sotiKbnNm}}
+                </div>
                 <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6">
                   <strong>機種区分：</strong>
                 </div>
-                <div class="col-lg-4 col-md-3 col-sm-6 col-xs-6">{{productTypeNm}}</div>
+                <div class="col-lg-4 col-md-3 col-sm-6 col-xs-6">
+                  {{kisyuKbnNm}}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6">
+                  <strong>　機種名：</strong>
+                </div>
+                <div class="col-lg-4 col-md-3 col-sm-6 col-xs-6">
+                  {{kisyuNm}}
+                </div>
               </div>
               <h5 class="context-sub-header">
                 <strong>障害状況</strong>
@@ -349,6 +367,7 @@
                 </div>
                 <div class="col-lg-4 col-md-3 col-sm-6 col-xs-6">{{productStatusNm}}</div>
               </div>
+
             </div>
           </div>
           <!-- /.panel-body -->
@@ -438,6 +457,16 @@
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">東京都</div>
               </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>注文主：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">ｘｘｘｘｘｘｘｘｘｘｘｘｘ</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>工期：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6"></div>
+              </div>
             </div>
             <h5 class="context-header">
               <strong>障害対応報告書(MR2)</strong>
@@ -452,19 +481,19 @@
                   <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                     <strong>作成日：</strong>
                   </div>
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.makeDate | datex:'YYYY/MM/DD'}}</div>
+                  <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{data?.makeDate | datex:'YYYY/MM/DD'}}</div>
                 </div>
                 <div class="row">
                   <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                     <strong>依頼元：</strong>
                   </div>
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.requestUserNm}}</div>
+                  <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{data?.requestUserNm}}</div>
                 </div>
                 <div class="row">
                   <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                     <strong>作業担当者：</strong>
                   </div>
-                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.workUserNm}}</div>
+                  <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{data?.workUserNm}}</div>
                 </div>
               </div>
             </div>
@@ -474,29 +503,35 @@
             <div class="context-margin">
               <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>受付No:</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <a (click)="showJiko()">
+                    <u>17122602</u>
+                  </a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>状態：</strong>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">第1報 正式発行</div>
+              </div>
+              <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>区分：</strong>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">品質（ランクＡ）</div>
-              </div>
-              <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>概要：</strong>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <a (click)="showJiko()">
-                    <u>XXXXXXXXXXXXXXXXXXXXXX</u>
-                  </a>
+                  XXXXXXXXXXXXXXXXXXXXXX
                 </div>
+              </div>
+              <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>顧客名：</strong>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">川本　健</div>
-              </div>
-              <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>機場名：</strong>
                 </div>
@@ -514,44 +549,49 @@
               </div>
             </div>
             <h5 class="context-header">
-              <strong>費用決済申請</strong>
+              <strong>費用決裁申請</strong>
             </h5>
-            <div class="context-margin">
+            <div *ngFor="let data of hiyoList" class="context-margin">
               <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>ID番号：</strong>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <a (click)="showHiyo('dsp','dsp',416161,'','1282')">
-                    <u>XXXXXXXXXX</u>
+                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">
+                  <a (click)="showHiyo('dsp','dsp',data?.idNo,'', data?.division)">
+                    <u>{{data?.idNo}}</u>
                   </a>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>ステータス：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">決裁</div>
               </div>
               <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>ステータス：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.status}}</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>区分：</strong>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">クレーム対応</div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>決裁番号：</strong>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">無償 第X号</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.division}}</div>
               </div>
               <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                   <strong>件名：</strong>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">XXXXXXXXXXXXXXXXXXXXXX</div>
+                <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">{{data?.subject}}</div>
+              </div>
+              <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <strong>概算金額：</strong>
+                  <strong>決裁番号：</strong>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">{{data?.approvalNo}}</div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                  <strong>概算金額（千円）：</strong>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                  <div class="pull-right">123,456</div>
+                  <div class="numbers-list">{{data?.amount | number}}</div>
                 </div>
+              </div>
+              <div class="row">
+                <br>
               </div>
             </div>
           </div>
@@ -569,10 +609,12 @@
             </h5>
             <div class="context-margin" *ngFor="let jikoIdList of relateIncidentKijoIdList">
               <a (click)="showRelateIncident(jikoIdList?.relateIncidentId)">
-                <u>#{{jikoIdList.relateIncidentNo}} {{jikoIdList.relateIncidentType}} {{jikoIdList.relateIncidentStartDateTime}} {{jikoIdList.relateIncidentKijoNm}} {{jikoIdList.relateIncidentCustNm}}</u>
+                <u>#{{jikoIdList?.relateIncidentNo}} {{jikoIdList?.relateIncidentType}} {{jikoIdList?.relateIncidentStartDateTime}}
+                  {{jikoIdList?.relateIncidentKijoNm}} {{jikoIdList?.relateIncidentCustNm}}</u>
               </a>
-              <div class="context-margin">
-                {{jikoIdList.relateIncidentContent}}
+              <div class="context-margin" title="{{jikoIdList?.relateIncidentContent}}">
+                {{jikoIdList?.relateIncidentContent | slice: 0:100 }}
+                <span *ngIf="jikoIdList?.relateIncidentContent?.length >= 100">…</span>
               </div>
             </div>
             <h5 class="context-header">
@@ -580,10 +622,12 @@
             </h5>
             <div class="context-margin" *ngFor="let custIdList of relateIncidentCustIdList">
               <a (click)="showRelateIncident(custIdList?.relateIncidentId)">
-                <u>#{{custIdList.relateIncidentNo}} {{custIdList.relateIncidentType}} {{custIdList.relateIncidentStartDateTime}} {{custIdList.relateIncidentKijoNm}} {{custIdList.relateIncidentCustNm}}</u>
+                <u>#{{custIdList?.relateIncidentNo}} {{custIdList?.relateIncidentType}} {{custIdList?.relateIncidentStartDateTime}}
+                  {{custIdList?.relateIncidentKijoNm}} {{custIdList?.relateIncidentCustNm}}</u>
               </a>
-              <div class="context-margin">
-                {{custIdList.relateIncidentContent}}
+              <div class="context-margin" title="{{custIdList?.relateIncidentContent}}">
+                {{custIdList?.relateIncidentContent | slice: 0:100 }}
+                <span *ngIf="custIdList?.relateIncidentContent?.length >= 100">…</span>
               </div>
             </div>
           </div>

@@ -19,29 +19,23 @@ export class DetailComponent implements OnInit {
   @ViewChild('common') common;
   @ViewChild('relateUser') relateUser;
 
-  user;
+  userId;
+  userNm;
+  userSectionCd;
+  userSectionNm;
   subscription: Subscription;
   constructor(private route: ActivatedRoute, private jsonpService: JsonpService, private loginService: LoginService) {
     /* ログイン情報の取得 */
-    this.subscription = loginService.loginUser$.subscribe(
-      user => { this.user = user; }
-    );
+    this.subscription = loginService.loginUserNm$.subscribe(user => { this.userNm = user; });
+    this.subscription = loginService.loginUserId$.subscribe(user => { this.userId = user; });
+    this.subscription = loginService.loginUserSectionCd$.subscribe(user => { this.userSectionCd = user; });
+    this.subscription = loginService.loginUserSectionNm$.subscribe(user => { this.userSectionNm = user; });
   }
 
   isLoading: boolean = true;
 
-  userId = "";
-  userName = "";
-  sectionCd = "";
-  sectionName = "";
-
   ngOnInit() {
     this.route.data.subscribe(obj => console.log(obj['category']));
-    // ログイン情報設定
-    this.userId = "999";
-    this.userName = "NARUTO";
-    this.sectionCd = "999";
-    this.sectionName = "KUNOHA";
 
     let ps = new URLSearchParams();
     let prmIncientId = this.route.snapshot.paramMap.get('incidentId');
@@ -52,9 +46,9 @@ export class DetailComponent implements OnInit {
 
     // ::: 2018.02.01 [#34] 関係者の既読処理 Add Start newtouch
     ps.set('userId', this.userId);
-    ps.set('userName', this.userName);
-    ps.set('sectionCd', this.sectionCd);
-    ps.set('sectionName', this.sectionName);
+    ps.set('userName', this.userNm);
+    ps.set('sectionCd', this.userSectionCd);
+    ps.set('sectionName', this.userSectionNm);
     // ::: 2018.02.01 [#34] 関係者の既読処理 Add End   newtouch
 
     // 画面表示パラメータの取得処理
@@ -74,6 +68,9 @@ export class DetailComponent implements OnInit {
 
             // 関連リンク 障害対応報告書(MR2) 取得
             this.findMr2List(this.incidentNo);
+            
+            // 関連リンク 費用決裁申請　取得
+            this.findHiyoList(this.incidentId);
           }
         }
         this.isLoading = false;
@@ -89,26 +86,26 @@ export class DetailComponent implements OnInit {
 
     // 画面表示パラメータ(関連インシデント)の取得処理
     this.jsonpService.requestGet('RelateIncidentGet.php', ps)
-    .subscribe(
-    data => {
-      // 通信成功時
-      if (data[0]) {
-        let one = data[0];
-        let relateIncidentKijoId = data['relateIncidentKijiIdAry'];
-        let relateIncidentCustId = data['relateIncidentCustIdAry'];
-        if (one.result !== '' && one.result == true) {
-          // 画面表示パラメータのセット処理
-          this.setDspParamRelateIncident(relateIncidentKijoId,relateIncidentCustId);
+      .subscribe(
+      data => {
+        // 通信成功時
+        if (data[0]) {
+          let one = data[0];
+          let relateIncidentKijoId = data['relateIncidentKijiIdAry'];
+          let relateIncidentCustId = data['relateIncidentCustIdAry'];
+          if (one.result !== '' && one.result == true) {
+            // 画面表示パラメータのセット処理
+            this.setDspParamRelateIncident(relateIncidentKijoId, relateIncidentCustId);
+          }
         }
+      },
+      error => {
+        // 通信失敗もしくは、コールバック関数内でエラー
+        console.log(error);
+        console.log('サーバとのアクセスに失敗しました。');
+        return false;
       }
-    },
-    error => {
-      // 通信失敗もしくは、コールバック関数内でエラー
-      console.log(error);
-      console.log('サーバとのアクセスに失敗しました。');
-      return false;
-    }
-    );
+      );
 
   }
 
@@ -152,6 +149,41 @@ export class DetailComponent implements OnInit {
       );
   }
 
+//費用情報を取得する
+findHiyoList(incidentId) {
+  console.log("費用情報成功");
+  let ps = new URLSearchParams();
+  if (incidentId) {
+    ps.set('incidentId', incidentId);
+  }
+
+  // 画面表示パラメータの取得処理
+  this.isLoading = true;
+  this.jsonpService.commonRequestGet('HiyoKessaiListDataGet.php', ps)
+    .subscribe(
+    data => {
+      // 通信成功時
+      console.log("ID番号成功");
+      console.log(data);
+      if (data[0]) {
+        if (data[0].result !== '' && data[0].result == true) {
+          // 画面表示パラメータのセット処理
+          let hiyoData = data.slice(1);
+          this.setHiyoDspParam(hiyoData); // 配列1つ目は、サーバ処理成功フラグなので除外
+        }
+      }
+      this.isLoading = false;
+    },
+    error => {
+      // 通信失敗もしくは、コールバック関数内でエラー
+      console.log(error);
+      console.log('サーバとのアクセスに失敗しました。');
+      this.isLoading = false;
+      return false;
+    }
+    );
+}
+
   //新しいウィンドウを開く(パターン1)
   // CMN_openNewWindow1(url,name,sizex,sizey,top,left){
   CMN_openNewWindow1(url, name, sizex, sizey) {
@@ -191,46 +223,30 @@ export class DetailComponent implements OnInit {
     this.SUB_WIN = this.CMN_openNewWindow1(url, "sub_jiko", 1200, 800);
   }
 
-  // 費用決済申請 新規登録画面表示処理 TODO:画面表示と自動転記
-  newHiyo(status, division, idno, bno, system_id, gougi_answer) {
-    if (system_id == "") {
-      system_id = "1282";
-    }
+  // 費用決済申請 新規登録画面表示処理
+  newHiyo(status, division, idno, bno, sysId) {
+    let url = environment.hiyoPath + "wf_main_input.php?"; // 環境に合わせたURLを作成する
+    url += "&user_id=" + this.userId;  //従業員コード
+    url += "&com_id=" + this.userSectionCd;    //職制コード
+    url += "&authority=0";
+    url += "&logintype=1";
+    url += "&base_id=";
+    url += "&system_id=" + sysId;
+    url += "&status=ins";
+    url += "&win_kbn=1";
+    url += "&ident_id=" + this.incidentId;
 
-    // var frm = window.document.fm1;
-    var strurl;
-
-    strurl = environment.hiyoPath + "wf_main_input.php";
-    strurl += "?user_id=ADF";
-    strurl += "&authority=9";
-    //	strurl += "&system_id=1282";
-    strurl += "&system_id=" + system_id;
-    strurl += "&status=" + status;
-    strurl += "&division=" + division;
-    strurl += "&idno=" + idno;
-    strurl += "&win_kbn=1";
-    if (gougi_answer) strurl += "&gougi_answer_mode=Y";
-
-    strurl += '&unit_flg=';
-    strurl += '&main_system_id=';
-    strurl += '&main_idno=';
-    strurl += '&param1=';
-    strurl += '&param2=';
-    strurl += '&param3=';
-    //	URLにBNOが含まれているかどうか？
-    if (bno != "") {
-      strurl = strurl.replace("BNO=&", "BNO=" + bno + "&");
-    }
-
-    this.SUB_WIN = this.CMN_openNewWindow1(strurl, "WF_EDIT", 1200, 800);
+    this.SUB_WIN = this.CMN_openNewWindow1(url, "WF_EDIT", 1200, 800);
     return;
   }
-
+  system_id;
   // 関連費用決済申請表示処理 TODO:固定値表示
-  showHiyo(status, division, idno, bno, system_id, gougi_answer) {
-
-    if (system_id == "") {
-      system_id = "1282";
+  showHiyo(status, division, idno, bno, system_mode) {
+    
+    if (system_mode == "障害対応") {
+      this.system_id = "1281";
+    }else if (system_mode == "クレーム対応"){
+      this.system_id = "1282";
     }
 
     // var frm = window.document.fm1;
@@ -240,12 +256,11 @@ export class DetailComponent implements OnInit {
     strurl += "?user_id=ADF";
     strurl += "&authority=9";
     //	strurl += "&system_id=1282";
-    strurl += "&system_id=" + system_id;
+    strurl += "&system_id=" + this.system_id;
     strurl += "&status=" + status;
     strurl += "&division=" + division;
     strurl += "&idno=" + idno;
     strurl += "&win_kbn=1";
-    if (gougi_answer) strurl += "&gougi_answer_mode=Y";
 
     strurl += '&unit_flg=';
     strurl += '&main_system_id=';
@@ -336,7 +351,7 @@ export class DetailComponent implements OnInit {
   salesDeptNm = ""; //営業部門名
   salesUserId = ""; //営業担当者ID
   salesUserNm = ""; //営業担当者名
-  deliveryPjNm = ""; //納入プロジェクト
+  deliveryPjNo = ""; //納入プロジェクト
   custDept = ""; //会社名・所属部署
   requester = ""; //依頼者
   contactTel = ""; //連絡先(TEL)
@@ -385,8 +400,11 @@ export class DetailComponent implements OnInit {
   actContent = ""; //処置内容
 
   // １－６．製品情報
-  productTypeCd = ""; //機種区分CD
-  productTypeNm = ""; //機種区分名
+  sotiKbnCd = ""; // 装置分類CD
+  sotiKbnNm = ""; // 装置分類名
+  kisyuKbnCd = ""; // 機種区分CD
+  kisyuKbnNm = ""; // 機種区分名
+  kisyuNm = ""; // 機種名  
   productTriggerCd = ""; //障害状況トリガーCD
   productTriggerNm = ""; //障害状況トリガー名
   productHindoCd = ""; //障害状況頻度CD
@@ -433,7 +451,7 @@ export class DetailComponent implements OnInit {
     this.salesDeptNm = data.salesDeptNm; //営業部門名
     this.salesUserId = data.salesUserId; //営業担当者ID
     this.salesUserNm = data.salesUserNm; //営業担当者名
-    this.deliveryPjNm = data.deliveryPjNm; //納入プロジェクト
+    this.deliveryPjNo = data.deliveryPjNo; //納入プロジェクト
     this.custDept = data.custDept; //会社名・所属部署
     this.requester = data.requester; //依頼者
     this.contactTel = data.contactTel; //連絡先(TEL)
@@ -482,8 +500,11 @@ export class DetailComponent implements OnInit {
     this.actContent = data.actContent; //処置内容
 
     // １－６．製品情報
-    this.productTypeCd = data.productTypeCd; //機種区分CD
-    this.productTypeNm = data.productTypeNm; //機種区分名
+    this.sotiKbnCd = data.sotiKbnCd; //装置分類CD
+    this.sotiKbnNm = data.sotiKbnNm; //装置分類名
+    this.kisyuKbnCd = data.kisyuKbnCd; //機種区分CD
+    this.kisyuKbnNm = data.kisyuKbnNm; //機種区分名
+    this.kisyuNm = data.kisyuNm; //機種名
     this.productTriggerCd = data.productTriggerCd; //障害状況トリガーCD
     this.productTriggerNm = data.productTriggerNm; //障害状況トリガー名
     this.productHindoCd = data.productHindoCd; //障害状況頻度CD
@@ -500,7 +521,7 @@ export class DetailComponent implements OnInit {
   }
 
   // 画面表示パラメータ(関連インシデント)のセット処理
-  setDspParamRelateIncident(relateIncidentKijoId,relateIncidentCustId) {
+  setDspParamRelateIncident(relateIncidentKijoId, relateIncidentCustId) {
     this.relateIncidentKijoIdList = relateIncidentKijoId;
     this.relateIncidentCustIdList = relateIncidentCustId;
   }
@@ -511,6 +532,14 @@ export class DetailComponent implements OnInit {
   // 画面表示パラメータのセット処理
   setMr2DspParam(data) {
     this.MR2List = data;
+  }
+
+  // ２－４. 費用決裁申請
+  // 費用リスト
+  hiyoList = "" 
+  // 画面表示パラメータのセット処理
+  setHiyoDspParam(data) {
+    this.hiyoList = data;
   }
 
   // 変更履歴パラメータのセット処理
@@ -669,9 +698,9 @@ export class DetailComponent implements OnInit {
     ps.set('relateId', this.delRelateId);
     // ログイン情報設定
     ps.set('userId', this.userId);
-    ps.set('userName', this.userName);
-    ps.set('sectionCd', this.sectionCd);
-    ps.set('sectionName', this.sectionName);
+    ps.set('userName', this.userNm);
+    ps.set('sectionCd', this.userSectionCd);
+    ps.set('sectionName', this.userSectionNm);
 
     // 検索
     this.jsonpService.requestGet('IncidentRelateUserDelete.php', ps)
@@ -716,9 +745,9 @@ export class DetailComponent implements OnInit {
       ps.set('relateUserSectionNm', salesDeptNm);
       // ログイン情報設定
       ps.set('userId', this.userId);
-      ps.set('userName', this.userName);
-      ps.set('sectionCd', this.sectionCd);
-      ps.set('sectionName', this.sectionName);
+      ps.set('userName', this.userNm);
+      ps.set('sectionCd', this.userSectionCd);
+      ps.set('sectionName', this.userSectionNm);
 
       // 検索
       this.jsonpService.requestGet('IncidentRelateUserSave.php', ps)

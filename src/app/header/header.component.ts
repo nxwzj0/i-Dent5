@@ -3,6 +3,8 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { URLSearchParams } from '@angular/http';
 
 import { JsonpService } from '../jsonp.service';
+import { LoginService } from '../login.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'my-header',
@@ -15,28 +17,60 @@ export class HeaderComponent {
   @Output() headerSearch: EventEmitter<any> = new EventEmitter();
   @Output() headerEdit: EventEmitter<any> = new EventEmitter();
 
-  constructor(private route: ActivatedRoute, private jsonpService: JsonpService, private router: Router) { }
+  userId;
+  userNm;
+  userSectionCd;
+  userSectionNm;
+  subscription: Subscription;
+  constructor(private route: ActivatedRoute, private jsonpService: JsonpService, private router: Router, private loginService: LoginService) {
+    /* ログイン情報の取得 */
+    this.subscription = loginService.loginUserNm$.subscribe(user => { this.userNm = user; });
+    this.subscription = loginService.loginUserId$.subscribe(user => { this.userId = user; });
+    this.subscription = loginService.loginUserSectionCd$.subscribe(user => { this.userSectionCd = user; });
+    this.subscription = loginService.loginUserSectionNm$.subscribe(user => { this.userSectionNm = user; });
+  }
 
   ngOnInit() {
     this.route.data.subscribe(obj => this.category = obj['category']);
-    this.searchConditionName();
+    this.logOutUrl = this.loginService.getLogOutUrl();
+
+    this.jsonpService.requestGet('IncidentGetSession.php', new URLSearchParams())
+      .subscribe(
+      data => {
+        // 通信成功時
+        if (data && data[0] && data[0].result !== '' && data[0].result == true) {
+          // ユーザIDを確実に取得してから初期表示を実施する
+          this.userId = data.slice(1)[0]['loginUserId'];
+          this.searchConditionName();
+        }
+      },
+      error => {
+        // 通信失敗もしくは、コールバック関数内でエラー
+        console.log(error);
+      }
+      );
   }
 
   category;
   condList = [];
+  logOutUrl;
 
   // 検索条件名の検索
   searchConditionName() {
 
     // パラメータの作成
     let ps = new URLSearchParams();
+    // ログイン情報設定
+    ps.set('userId', this.userId);
+    ps.set('userName', this.userNm);
+    ps.set('sectionCd', this.userSectionCd);
+    ps.set('sectionName', this.userSectionNm);
 
     // 検索項目の検索
-    this.jsonpService.requestGet('IncidentListConditionDelete.php', ps)
+    this.jsonpService.requestGet('IncidentListConditionGet.php', ps)
       .subscribe(
       data => {
         // 通信成功時
-        console.log(data);
         if (data[0]) {
           let list = data[0];
           if (list.result !== '' && list.result == true) {
@@ -57,11 +91,6 @@ export class HeaderComponent {
   // 画面表示パラメータのセット処理
   setDspParam(data) {
     this.condList = data;
-  }
-
-  // ログアウト処理
-  logout() {
-    console.log("ログアウト処理");
   }
 
   // リロード(検索)

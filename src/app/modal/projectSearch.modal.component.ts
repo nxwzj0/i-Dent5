@@ -45,17 +45,27 @@ export class ProjectSearchModalComponent {
 
   // ページング処理
   pageChanged(event: any): void {
+    if (!(this.itemsPerPage > 0)) {
+      this.itemsPerPage = 10;
+    }
     this.start = this.itemsPerPage * (this.currentPage - 1);
     let tmpStart: number = +this.start;
     let tmpItemsPerPage: number = +this.itemsPerPage;
     this.end = tmpStart + tmpItemsPerPage;
+    this.search();
   }
+
 
   // モーダル表示
   openModal() {
     this.clearProjectSearch();
-    this.template.show();
+    this.bigTotalItems = 0; // 総数
+    this.itemsPerPage = 10; // 1ページに表示する件数
+    this.currentPage = 0;
+    this.start = 0;
+    this.end = 10;
     this.search();
+    this.template.show();
   }
 
   // 検索条件の初期化
@@ -74,6 +84,8 @@ export class ProjectSearchModalComponent {
     ps.set("inqNo", this.searchInqNo);
     ps.set("consumerNm", this.searchConsumerNm);
     ps.set("summaryNm", this.searchSummaryNm);
+    ps.set("pagingStart", (this.start + 1).toString());
+    ps.set("pagingEnd", this.itemsPerPage.toString());
 
     // 検索
     this.isLoading = true;
@@ -81,26 +93,20 @@ export class ProjectSearchModalComponent {
       .subscribe(
       data => {
         // 通信成功時
-        console.group("ProjectSearchModalComponent.search() success");
-        console.log(data);
-        console.groupEnd();
         if (data[0]) {
           let list = data[0];
           if (list.result !== '' && list.result == true) {
             // 画面表示パラメータのセット処理
+            this.bigTotalItems = list.count; // ページング(総数)
             this.setDspParam(data.slice(1)); // 配列1つ目は、サーバ処理成功フラグなので除外
           }
         }
-        this.currentPage = 1;
-        this.pageChanged(null);
         this.isLoading = false;
       },
       error => {
         // 通信失敗もしくは、コールバック関数内でエラー
-        console.group("ProjectSearchModalComponent.search() fail");
         console.error(error);
         console.log('サーバとのアクセスに失敗しました。');
-        console.groupEnd();
         this.isLoading = false;
         return false;
       }
@@ -111,8 +117,6 @@ export class ProjectSearchModalComponent {
   projList = [];
   // 画面表示パラメータのセット処理
   setDspParam(data) {
-    // ページングの設定
-    this.bigTotalItems = data.length;
     // プロジェクトリストをセット
     this.projList = data;
   }

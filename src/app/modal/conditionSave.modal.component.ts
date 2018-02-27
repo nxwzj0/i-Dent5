@@ -12,8 +12,9 @@ import { JsonpService } from '../jsonp.service';
   styleUrls: ['./modal.component.css']
 })
 export class ConditionSaveModalComponent {
-  @ViewChild('template')
-  template;
+  @ViewChild('template') template;
+  @ViewChild('common') common;
+  @ViewChild('alertCommon') alertCommon;
 
   // listイベント(親コンポーネントのメソッド呼び出し)
   @Output() conDelButtonshowDelFlg: EventEmitter<any> = new EventEmitter();
@@ -26,6 +27,7 @@ export class ConditionSaveModalComponent {
   hidden_condition = null;
   // モーダル表示
   openModal(condition) {
+    this.condNm = null;
     if (condition[0]) {
       this.template.show();
       this.hidden_condition = condition;
@@ -56,19 +58,14 @@ export class ConditionSaveModalComponent {
   // 検索項目保存処理
   conditionSave() {
     if (this.condNm == null || this.condNm == "") {
-      alert("検索条件名は必須入力。");
+      this.alertCommon.openModal('警告', '検索条件名は必須入力です。', '', '閉じる');
       return false;
     }
     if (this.condNm.length > 50) {
-      alert("検索条件名の最大文字数は50です。");
+      this.alertCommon.openModal('警告', '検索条件名は最大50文字です。', '', '閉じる');
       return false;
     }
-    if (confirm("検索条件を保存します。よろしいですか？")) {
-      this.conditionSaveTrue();
-    }
-    else {
-      window.close();
-    }
+    this.common.openModal('確認', '検索条件を保存します。宜しいですか？', 'OK', 'キャンセル');
   }
 
   // 検索項目保存処理True
@@ -119,8 +116,8 @@ export class ConditionSaveModalComponent {
     // 設備
     ps.set("setubiNm", this.hidden_condition[26]);
     // 都道府県
-    if(this.hidden_condition[27] != 0){
-      ps.set("prefCd", this.hidden_condition[27]);
+    if (this.hidden_condition[27]) {
+      ps.set("prefNm", this.hidden_condition[27]);
     }
     // 顧客
     ps.set("custNm", this.hidden_condition[28]);
@@ -150,36 +147,39 @@ export class ConditionSaveModalComponent {
       .subscribe(
       data => {
         // 通信成功時
-        console.log('成功。');
-        console.log(data);
-        if(data[0]['resultFlg'] == '0'){
-          alert(data[0]['resultMsg']);
-          this.conDelButtonshowDelFlg.emit({ "showDelFlg": true});
+        if (data[0]['resultFlg'] == '0') {
+          this.common.openModal('登録完了', data[0]['resultMsg'], '', '閉じる');
+          this.conDelButtonshowDelFlg.emit({ "showDelFlg": true });
           this.changeCondition.emit(""); // 検索条件が変更された
           this.template.hide();
-        }else{
-          alert(data[0]['resultMsg']);
+        } else {
+          this.common.openModal('', data[0]['resultMsg'], '', '閉じる');
         }
       },
       error => {
         // 通信失敗もしくは、コールバック関数内でエラー
         console.log(error);
         console.log('サーバとのアクセスに失敗しました。');
-        alert('登録に失敗しました');
+        this.common.openModal('', '登録に失敗しました', '', '閉じる');
         return false;
       }
       );
 
   }
 
+  // 検索項目保存処理False
+  conditionSaveFalse() {
+    this.template.close();
+  }
+
   // 日付型を日付フォーマット文字列に変更
   getDateStringFromDate(date) {
 
     if (date && date.getFullYear()) {
-      var y:number = date.getFullYear();
-      var m:number = date.getMonth();
+      var y: number = date.getFullYear();
+      var m: number = date.getMonth();
       m++;
-      var d:number = date.getDate();
+      var d: number = date.getDate();
       return y + "-" + m + "-" + d + " 00:00:00";
     } else {
       // 日付型でない値の場合

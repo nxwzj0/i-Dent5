@@ -10,4 +10,5 @@ export const environment = {
   envCommonPath: 'http://localhost/COMMONAPI/',
   jikoPath: 'http://localhost/JIKO/',
   hiyoPath: 'http://localhost/WORKFLOW/',
+  crmPath: 'http://localhost/CALL/php/',
 };

@@ -25,16 +25,19 @@ defineLocale('ja', jaLocale);
   styleUrls: ['./list.component.css']
 })
 export class ListComponent implements OnInit {
-  @ViewChild('header')
-  header;
+  @ViewChild('header') header;
 
-  user;
+  userId;
+  userNm;
+  userSectionCd;
+  userSectionNm;
   subscription: Subscription;
   constructor(private route: ActivatedRoute, private jsonpService: JsonpService, private loginService: LoginService, private _localeService: BsLocaleService) {
     /* ログイン情報の取得 */
-    this.subscription = loginService.loginUser$.subscribe(
-      user => { this.user = user; }
-    );
+    this.subscription = loginService.loginUserNm$.subscribe(user => { this.userNm = user; });
+    this.subscription = loginService.loginUserId$.subscribe(user => { this.userId = user; });
+    this.subscription = loginService.loginUserSectionCd$.subscribe(user => { this.userSectionCd = user; });
+    this.subscription = loginService.loginUserSectionNm$.subscribe(user => { this.userSectionNm = user; });
     // datepikerの設定
     this.bsConfig = Object.assign({}, { dateInputFormat: 'YYYY/MM/DD' });
     this._localeService.use(this.locale);
@@ -45,11 +48,6 @@ export class ListComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(obj => console.log(obj['category']));
 
-    // ログイン情報設定
-    this.userId = "userId";
-    this.userName = "userName";
-    this.sectionCd = "secCd";
-    this.sectionName = "secName";
     // 検索条件のデフォルト設定
     this.setDefaultShow();
     let condId = this.route.snapshot.paramMap.get('condId');
@@ -103,11 +101,6 @@ export class ListComponent implements OnInit {
     return str;
   }
 
-  // 検索項目削除処理
-  deleteCondition() {
-
-  }
-
   // 検索項目追加処理
   addCondition() {
     let itemNm = this.selCondition;
@@ -158,8 +151,8 @@ export class ListComponent implements OnInit {
         // 検索項目プルダウンを初期化
         this.selCondition = "0";
         break;
-      case 'prefCdShow':
-        this.prefCdShow = true;
+      case 'prefNmShow':
+        this.prefNmShow = true;
         // 検索項目プルダウンを初期化
         this.selCondition = "0";
         break;
@@ -214,37 +207,9 @@ export class ListComponent implements OnInit {
     if (this.parentIncidentNoShow && !this.lengthCheck("親インシデント番号", this.parentIncidentNo, 50)) {
       return false;
     }
-    if (this.incidentStartDateTimeShow && !this.lengthCheck("発生日時（開始）", this.incidentStartDateTimeFrom, 20)) {
+    // 日付項目の確認
+    if (!this.checkDate()) {
       return false;
-    }
-    if (this.incidentStartDateTimeFrom != null) {
-      if (this.incidentStartDateTimeShow && !this.dateFormatCheck("発生日時（開始）", this.incidentStartDateTimeFrom)) {
-        return false;
-      }
-    }
-    if (this.incidentStartDateTimeShow && !this.lengthCheck("発生日時（終了）", this.incidentStartDateTimeTo, 20)) {
-      return false;
-    }
-    if (this.incidentStartDateTimeTo != null) {
-      if (this.incidentStartDateTimeShow && !this.dateFormatCheck("発生日時（終了）", this.incidentStartDateTimeTo)) {
-        return false;
-      }
-    }
-    if (this.callDateShow && !this.lengthCheck("受付日（開始）", this.callStartDateFrom, 20)) {
-      return false;
-    }
-    if (this.callStartDateFrom != null) {
-      if (this.callDateShow && !this.dateFormatCheck("受付日（開始）", this.callStartDateFrom)) {
-        return false;
-      }
-    }
-    if (this.callDateShow && !this.lengthCheck("受付日（終了）", this.callStartDateTo, 20)) {
-      return false;
-    }
-    if (this.callStartDateTo != null) {
-      if (this.callDateShow && !this.dateFormatCheck("受付日（終了）", this.callStartDateTo)) {
-        return false;
-      }
     }
     if (this.kijoNmShow && !this.lengthCheck("機場", this.kijoNm, 50)) {
       return false;
@@ -314,7 +279,7 @@ export class ListComponent implements OnInit {
       // 設備
       conditionArray[26] = this.setubiNm;
       // 都道府県
-      conditionArray[27] = this.prefCd;
+      conditionArray[27] = this.prefNm;
       // 顧客
       conditionArray[28] = this.custNm;
       // 顧客分類
@@ -332,11 +297,11 @@ export class ListComponent implements OnInit {
       // userId
       conditionArray[37] = this.userId;
       // userName
-      conditionArray[38] = this.userName;
+      conditionArray[38] = this.userNm;
       // sectionCd
-      conditionArray[39] = this.sectionCd;
+      conditionArray[39] = this.userSectionCd;
       // sectionName
-      conditionArray[40] = this.sectionName;
+      conditionArray[40] = this.userSectionNm;
     } else {
       conditionArray[0] = false;
     }
@@ -345,7 +310,7 @@ export class ListComponent implements OnInit {
   }
 
   // 登録している検索条件が変更された
-  changeCondition() {
+  changeCondition($event: any) {
     // ヘッダーの検索条件名の表示を更新する
     this.header.searchConditionName();
   }
@@ -382,7 +347,7 @@ export class ListComponent implements OnInit {
   kijoNmShow = false;
   jigyosyutaiNmShow = false;
   setubiNmShow = false;
-  prefCdShow = false;
+  prefNmShow = false;
   custNmShow = false;
   custTypeShow = false;
   salesDeptNmShow = false;
@@ -391,10 +356,10 @@ export class ListComponent implements OnInit {
   condList = [];
   condId = null;
   condNm = null;
-  userId = null;
-  userName = null;
-  sectionCd = null;
-  sectionName = null;
+  // userId = null;
+  // userName = null;
+  // sectionCd = null;
+  // sectionName = null;
   incidentTypeSyougai = null;
   incidentTypeJiko = null;
   incidentTypeClaim = null;
@@ -415,7 +380,6 @@ export class ListComponent implements OnInit {
   industryTypeWBC = null;
   industryTypeOther = null;
   jigyosyutaiNm = null;
-  prefCd = '0';
   custNm = null;
   custTypeNenkan = null;
   custTypeTenken = null;
@@ -451,7 +415,7 @@ export class ListComponent implements OnInit {
     // 設備
     this.setubiNmShow = true;
     // 都道府県
-    this.prefCdShow = true;
+    this.prefNmShow = true;
     // 顧客
     this.custNmShow = false;
     // 顧客分類
@@ -542,7 +506,7 @@ export class ListComponent implements OnInit {
       ps.set("callContent", this.callContent);
       ps.set("kijoNm", this.kijoNm);
       ps.set("setubiNm", this.setubiNm);
-      ps.set("prefCd", this.prefCd);
+      ps.set("prefNm", this.prefNm);
 
       var callStartDateFromStr = this.getDateStringFromDate(this.callStartDateFrom);
       ps.set("callStartDateFrom", callStartDateFromStr);
@@ -587,7 +551,6 @@ export class ListComponent implements OnInit {
         .subscribe(
         data => {
           // 通信成功時
-          console.log(data);
           if (data[0]) {
             let list = data[0];
             if (list.result !== '' && list.result == true) {
@@ -627,7 +590,6 @@ export class ListComponent implements OnInit {
       .subscribe(
       data => {
         // 通信成功時
-        console.log(data);
         if (condId != '0') {
           this.conditionShowArray = data[data.length - 1];
           for (var i = 0; i < this.conditionShowArray.length; i++) {
@@ -696,18 +658,21 @@ export class ListComponent implements OnInit {
         break;
       case "parentIncidentNo":// 親インシデント番号
         this.parentIncidentNo = condVal;
+        this.parentIncidentNoShow = true;
         break;
       case "incidentStartDateTimeFrom":// 発生日時（開始）
-        this.incidentStartDateTimeFrom = condVal;
+        this.incidentStartDateTimeFrom = this.getJsDate(condVal);
+        this.incidentStartDateTimeShow = true;
         break;
       case "incidentStartDateTimeTo":// 発生日時（終了）
-        this.incidentStartDateTimeTo = condVal;
+        this.incidentStartDateTimeTo = this.getJsDate(condVal);
+        this.incidentStartDateTimeShow = true;
         break;
       case "callStartDateFrom":// 受付日（開始）
-        this.callStartDateFrom = condVal;
+        this.callStartDateFrom = this.getJsDate(condVal);
         break;
       case "callStartDateTo":// 受付日（終了）
-        this.callStartDateTo = condVal;
+        this.callStartDateTo = this.getJsDate(condVal);
         break;
       case "industryTypeMachinery":// 業種区分（機械）
         this.industryTypeShow = true;
@@ -742,15 +707,17 @@ export class ListComponent implements OnInit {
         break;
       case "jigyosyutaiNm":// 事業主体
         this.jigyosyutaiNm = condVal;
+        this.jigyosyutaiNmShow = true;
         break;
       case "setubiNm":// 設備
         this.setubiNm = condVal;
         break;
-      case "prefCd":// 都道府県
-        this.prefCd = condVal;
+      case "prefNm":// 都道府県
+        this.prefNm = condVal;
         break;
       case "custNm":// 顧客
         this.custNm = condVal;
+        this.custNmShow = true;
         break;
       case "custTypeNenkan":// 顧客分類（年間契約）
         this.custTypeShow = true;
@@ -773,41 +740,57 @@ export class ListComponent implements OnInit {
         this.custTypeOther = true;
         break;
       case "salesDeptNm":// 営業部門
-        this.custNm = condVal;
+        this.salesDeptNm = condVal;
+        this.salesDeptNmShow = true;
         break;
       case "salesUserNm":// 営業担当者
-        this.custNm = condVal;
+        this.salesUserNm = condVal;
+        this.salesUserNmShow = true;
         break;
       case "relateUserNm":// 関係者
-        this.custNm = condVal;
+        this.relateUserNm = condVal;
+        this.relateUserNmShow = true;
         break;
       default:
         break;
     }
   }
 
+  // サーバから取得した日付をJavascriptのDate型に変更する（失敗時は、nullを返す）
+  getJsDate(date) {
+    if (date && new Date(date)) {
+      return new Date(date);
+    }
+    return null;
+  }
+
   // 日付型を日付フォーマット文字列に変更
   getDateStringFromDate(date) {
-
     if (date && date.getFullYear()) {
       var y: number = date.getFullYear();
       var m: number = date.getMonth();
       m++;
       var d: number = date.getDate();
-      // 2018.01.20 Newtouch更新 start
-      // return  y + "-" + m + "-" + d + " 00:00:00";
-      return y + "-" + m + "-" + d;
-      // 2018.01.20 Newtouch更新 end
+      if (y) {
+        var yStr = ('00' + y).slice(-4);
+      }
+      if (m) {
+        var mStr = ('00' + m).slice(-2);
+      }
+      if (d) {
+        var dStr = ('00' + d).slice(-2);
+      }
+      if (yStr && mStr && dStr) {
+        return yStr + "/" + mStr + "/" + dStr + " 00:00:00";
+      } else {
+        // 日付型でない値の場合
+        return null;
+      }
+
     } else {
       // 日付型でない値の場合
       return null;
     }
-
-  }
-
-  // 詳細画面表示処理
-  showDetail() {
-
   }
 
   // 画面表示パラメータのセット処理
@@ -964,11 +947,11 @@ export class ListComponent implements OnInit {
     let ps = new URLSearchParams();
     ps.set("keyword", this.keyword);
     // 検索
+    this.isLoading = true;
     this.jsonpService.requestGet('IncidentListDataGetByKeyword.php', ps)
       .subscribe(
       data => {
         // 通信成功時
-        console.log(data);
         if (data[0]) {
           let list = data[0];
           if (list.result !== '' && list.result == true) {
@@ -976,11 +959,13 @@ export class ListComponent implements OnInit {
             this.setDspParam(data.slice(1)); // 配列1つ目は、サーバ処理成功フラグなので除外
           }
         }
+        this.isLoading = false;
       },
       error => {
         // 通信失敗もしくは、コールバック関数内でエラー
         console.log(error);
         console.log('サーバとのアクセスに失敗しました。');
+        this.isLoading = false;
         return false;
       }
       );
@@ -1001,8 +986,8 @@ export class ListComponent implements OnInit {
       case "setubiNm": // 設備
         this.setubiNmShow = false;
         break;
-      case "prefCd": // 都道府県
-        this.prefCdShow = false;
+      case "prefNm": // 都道府県
+        this.prefNmShow = false;
         break;
       case "callDate": // 受付日
         this.callDateShow = false;
@@ -1064,28 +1049,28 @@ export class ListComponent implements OnInit {
         this.incidentStartDateTimeTo = "";
         this.callStartDateFrom = "";
         this.callStartDateTo = "";
-        this.prefCd = "0";
-        this.incidentTypeSyougai = false;
-        this.incidentTypeJiko = false;
-        this.incidentTypeClaim = false;
-        this.incidentTypeToiawase = false;
-        this.incidentTypeInfo = false;
-        this.incidentTypeOther = false;
-        this.incidentStatusCall = false;
-        this.incidentStatusTaio = false;
-        this.incidentStatusAct = false;
-        this.industryTypeMachinery = false;
-        this.industryTypeElectricalMachinery = false;
-        this.industryTypeInstrumentation = false;
-        this.industryTypeInfo = false;
-        this.industryTypeEnvironment = false;
-        this.industryTypeWBC = false;
-        this.industryTypeOther = false;
-        this.custTypeNenkan = false;
-        this.custTypeTenken = false;
-        this.custTypeNasi = false;
-        this.custTypeKasi = false;
-        this.custTypeOther = false;
+        this.prefNm = null;
+        this.incidentTypeSyougai = null;
+        this.incidentTypeJiko = null;
+        this.incidentTypeClaim = null;
+        this.incidentTypeToiawase = null;
+        this.incidentTypeInfo = null;
+        this.incidentTypeOther = null;
+        this.incidentStatusCall = null;
+        this.incidentStatusTaio = null;
+        this.incidentStatusAct = null;
+        this.industryTypeMachinery = null;
+        this.industryTypeElectricalMachinery = null;
+        this.industryTypeInstrumentation = null;
+        this.industryTypeInfo = null;
+        this.industryTypeEnvironment = null;
+        this.industryTypeWBC = null;
+        this.industryTypeOther = null;
+        this.custTypeNenkan = null;
+        this.custTypeTenken = null;
+        this.custTypeNasi = null;
+        this.custTypeKasi = null;
+        this.custTypeOther = null;
         break;
       case "keyword": // キーワード
         this.keyword = "";
@@ -1102,8 +1087,8 @@ export class ListComponent implements OnInit {
       case "setubiNm": // 設備
         this.setubiNm = "";
         break;
-      case "prefCd": // 都道府県
-        this.prefCd = "0";
+      case "prefNm": // 都道府県
+        this.prefNm = null;
         break;
       case "callDate": // 受付日
         this.checkDateShowCallStartDateFrom = false; //受付日（FROM）(日付型チェックエラーメッセージ表示Flg)
@@ -1112,33 +1097,33 @@ export class ListComponent implements OnInit {
         this.callStartDateTo = "";
         break;
       case "incidentType": // インシデント分類
-        this.incidentTypeSyougai = false;
-        this.incidentTypeJiko = false;
-        this.incidentTypeClaim = false;
-        this.incidentTypeToiawase = false;
-        this.incidentTypeInfo = false;
-        this.incidentTypeOther = false;
+        this.incidentTypeSyougai = null;
+        this.incidentTypeJiko = null;
+        this.incidentTypeClaim = null;
+        this.incidentTypeToiawase = null;
+        this.incidentTypeInfo = null;
+        this.incidentTypeOther = null;
         break;
       case "incidentSts": // ステータス
-        this.incidentStatusCall = false;
-        this.incidentStatusTaio = false;
-        this.incidentStatusAct = false;
+        this.incidentStatusCall = null;
+        this.incidentStatusTaio = null;
+        this.incidentStatusAct = null;
         break;
       case "industryType": // 業種区分
-        this.industryTypeMachinery = false;
-        this.industryTypeElectricalMachinery = false;
-        this.industryTypeInstrumentation = false;
-        this.industryTypeInfo = false;
-        this.industryTypeEnvironment = false;
-        this.industryTypeWBC = false;
-        this.industryTypeOther = false;
+        this.industryTypeMachinery = null;
+        this.industryTypeElectricalMachinery = null;
+        this.industryTypeInstrumentation = null;
+        this.industryTypeInfo = null;
+        this.industryTypeEnvironment = null;
+        this.industryTypeWBC = null;
+        this.industryTypeOther = null;
         break;
       case "custType": // 顧客分類
-        this.custTypeNenkan = false;
-        this.custTypeTenken = false;
-        this.custTypeNasi = false;
-        this.custTypeKasi = false;
-        this.custTypeOther = false;
+        this.custTypeNenkan = null;
+        this.custTypeTenken = null;
+        this.custTypeNasi = null;
+        this.custTypeKasi = null;
+        this.custTypeOther = null;
         break;
       case "parentIncidentNo": // 親インシデント番号
         this.parentIncidentNo = "";

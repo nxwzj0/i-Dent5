@@ -59,10 +59,7 @@ export class AppComponent {
       // ローカルの場合は、仮ユーザ
       var userAry: Array<any> = [
         {
-          'loginUserId': 'ADFDEV',
-          'loginUserNm': '開発ユーザ',
-          'loginSectionCd': 'ADFDEVSEC',
-          'loginSectionNm': '開発部署',
+          'loginUserId': 'ADF',
         }];
       this.loginService.logIn(userAry);
     } else {

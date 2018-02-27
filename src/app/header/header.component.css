@@ -75,3 +75,12 @@
 .dropdown:hover > .dropdown-menu{
     display: block;
 }
+
+/* ログアウト */
+.logout {
+    color: white;
+}
+.logout:hover {
+    color: #23527c;
+    background-color: white;
+}

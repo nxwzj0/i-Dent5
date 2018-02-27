@@ -28,8 +28,8 @@
             <div class="row">
               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="navbar-text navbar-right header-user-area-text">
-                  <span class="header-user-name">川本　健</span>
-                  <u (click)="logout()">ログアウト</u>
+                  <span class="header-user-name">{{userSectionNm}}&nbsp;&nbsp;{{userNm}}</span>
+                  <a class="logout" (click)="logOffFrm.submit()">ログアウト</a>
                 </div>
               </div>
             </div>
@@ -70,4 +70,4 @@
   </div>
 </div>
 
-
+<form #logOffFrm name="frmLogoff" method="post" target="_top" action="{{logOutUrl}}"></form>

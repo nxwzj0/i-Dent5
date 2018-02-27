@@ -58,8 +58,8 @@ export class UserSearchModalComponent {
       this.modalType = modalTypeFromParent;
     }
     this.clearUserSearch();
-    this.template.show();
     this.search();
+    this.template.show();
   }
 
   // 検索条件の初期化

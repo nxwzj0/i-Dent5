@@ -57,6 +57,81 @@
               <input name="searchCallContent" type="text" class="form-control" [(ngModel)]="searchCallContent">
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  機場
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <input name="txt_kijoNm" type="text" class="form-control" [(ngModel)]="kijoNm">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
+              <div class="row">
+                <label class="col-lg-9 col-md-9 col-sm-9 col-xs-9 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 bg-warning text-center input-label">
+                  都道府県
+                </label>
+              </div>
+            </div>
+            <div class="col-lg-5 col-md-4 col-sm-6 col-xs-5">
+              <select name="sel_PrefNm" class="form-control search-dropdown" [(ngModel)]="prefNm">
+                <option value=""></option>
+                <option value="北海道">北海道</option>
+                <option value="青森県">青森県</option>
+                <option value="岩手県">岩手県</option>
+                <option value="宮城県">宮城県</option>
+                <option value="秋田県">秋田県</option>
+                <option value="山形県">山形県</option>
+                <option value="福島県">福島県</option>
+                <option value="茨城県">茨城県</option>
+                <option value="栃木県">栃木県</option>
+                <option value="群馬県">群馬県</option>
+                <option value="埼玉県">埼玉県</option>
+                <option value="千葉県">千葉県</option>
+                <option value="東京都">東京都</option>
+                <option value="神奈川県">神奈川県</option>
+                <option value="新潟県">新潟県</option>
+                <option value="富山県">富山県</option>
+                <option value="石川県">石川県</option>
+                <option value="福井県">福井県</option>
+                <option value="山梨県">山梨県</option>
+                <option value="長野県">長野県</option>
+                <option value="岐阜県">岐阜県</option>
+                <option value="静岡県">静岡県</option>
+                <option value="愛知県">愛知県</option>
+                <option value="三重県">三重県</option>
+                <option value="滋賀県">滋賀県</option>
+                <option value="京都府">京都府</option>
+                <option value="大阪府">大阪府</option>
+                <option value="兵庫県">兵庫県</option>
+                <option value="奈良県">奈良県</option>
+                <option value="和歌山県">和歌山県</option>
+                <option value="鳥取県">鳥取県</option>
+                <option value="島根県">島根県</option>
+                <option value="岡山県">岡山県</option>
+                <option value="広島県">広島県</option>
+                <option value="山口県">山口県</option>
+                <option value="徳島県">徳島県</option>
+                <option value="香川県">香川県</option>
+                <option value="愛媛県">愛媛県</option>
+                <option value="高知県">高知県</option>
+                <option value="福岡県">福岡県</option>
+                <option value="佐賀県">佐賀県</option>
+                <option value="長崎県">長崎県</option>
+                <option value="熊本県">熊本県</option>
+                <option value="大分県">大分県</option>
+                <option value="宮崎県">宮崎県</option>
+                <option value="鹿児島県">鹿児島県</option>
+                <option value="沖縄県">沖縄県</option>
+              </select>
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-lg-3 col-md-4 col-sm-4 col-xs-5 label-padding">
               <div class="row">
@@ -68,8 +143,8 @@
             <div class="col-lg-6 col-md-6 col-sm-7 col-xs-7">
               <div class="date-div">
                 <div class="input-group">
-                  <input id="txt_callStartDateFrom" name="txt_callStartDateFrom" type="text" class="form-control" #dpCallStartDateFrom="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
-                    [(bsValue)]="searchCallStartDateFrom">
+                  <input id="txt_callStartDateFrom" name="txt_callStartDateFrom" type="text" class="form-control" #dpCallStartDateFrom="bsDatepicker"
+                    bsDatepicker [bsConfig]="bsConfig" [(bsValue)]="searchCallStartDateFrom">
                   <span class="input-group-btn">
                     <button type="button" class="btn btn-input-support" (click)="dpCallStartDateFrom.toggle()">
                       <i class="fa fa-calendar"></i>
@@ -83,8 +158,8 @@
               <span class="text-center inner-text">～</span>
               <div class="date-div">
                 <div class="input-group">
-                  <input id="txt_callStartDateTo" name="txt_callStartDateTo" type="text" class="form-control" #dpCallStartDateTo="bsDatepicker" bsDatepicker [bsConfig]="bsConfig"
-                    [(bsValue)]="searchCallStartDateTo">
+                  <input id="txt_callStartDateTo" name="txt_callStartDateTo" type="text" class="form-control" #dpCallStartDateTo="bsDatepicker"
+                    bsDatepicker [bsConfig]="bsConfig" [(bsValue)]="searchCallStartDateTo">
                   <span class="input-group-btn">
                     <button type="button" class="btn btn-input-support" (click)="dpCallStartDateTo.toggle()">
                       <i class="fa fa-calendar"></i>
@@ -164,7 +239,7 @@
                 firstText="&laquo;" lastText="&raquo;" (click)="pageChanged($event)"></pagination>
             </div>
             <div class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-lg-2 col-md-2 col-sm-3 col-xs-4">
-              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged()"> 件/頁
+              <input name="itemperPage" [(ngModel)]="itemsPerPage" type="text" class="itemsPerPage" (input)="pageChanged(null)"> 件/頁
             </div>
           </div>
 
@@ -193,7 +268,8 @@
                         </button>
                       </td>
                       <td class="code-list">{{data.incidentNo}}</td>
-                      <td class="char-list">{{data?.callContent | slice: 0:20 }}
+                      <td class="char-list" title="{{data?.callContent}}">
+                        {{data?.callContent | slice: 0:20 }}
                         <span *ngIf="data?.callContent.length >= 20">…</span>
                       </td>
                       <td class="date-list">{{data?.callDate | datex:'YYYY/MM/DD'}}</td>

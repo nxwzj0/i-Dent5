@@ -21,18 +21,19 @@ import { EditComponent } from './edit/edit.component';
 import { Mr2Component } from './mr2/mr2.component';
 import { ProjectComponent } from './project/project.component';
 import { CommonComponent } from './common/common.component';
+import { FileComponent } from './file/file.component';
 
+import { BtnModalComponent } from './modal/btn.modal.component';
 import { CommonModalComponent } from './modal/common.modal.component';
 import { RelateUserAddModalComponent } from './modal/relateUserAdd.modal.component';
 import { IncidentSearchModalComponent } from './modal/incidentSearch.modal.component';
-import { KijoSearchModalComponent } from './modal/kijoSearch.modal.component';
 import { UserSearchModalComponent } from './modal/userSearch.modal.component';
 import { SectionSearchModalComponent } from './modal/sectionSearch.modal.component';
 import { ConditionSaveModalComponent } from './modal/conditionSave.modal.component';
 import { ConditionDeleteModalComponent } from './modal/conditionDelete.modal.component';
 import { ProjectSearchModalComponent } from './modal/projectSearch.modal.component';
 import { CustomerSearchModalComponent } from './modal/customerSearch.modal.component';
-import { EquipmentSearchModalComponent } from './modal/equipmentSearch.modal.component';
+import { SetubiSearchModalComponent } from './modal/setubiSearch.modal.component';
 import { LoadingComponent } from './loading/loading.component';
 
 import { LoginService } from './login.service';
@@ -55,18 +56,19 @@ import { DatexPipe } from './pipe/datex.pipe';
     EditComponent,
     Mr2Component,
     ProjectComponent,
+    BtnModalComponent,
     CommonModalComponent,
     RelateUserAddModalComponent,
     IncidentSearchModalComponent,
-    KijoSearchModalComponent,
     UserSearchModalComponent,
     SectionSearchModalComponent,
     ConditionSaveModalComponent,
     ConditionDeleteModalComponent,
     ProjectSearchModalComponent,
     CustomerSearchModalComponent,
-    EquipmentSearchModalComponent,
+    SetubiSearchModalComponent,
     CommonComponent,
+    FileComponent,
     LoadingComponent,
     OrderByPipe,
     DatexPipe

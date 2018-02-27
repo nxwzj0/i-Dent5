@@ -48,7 +48,7 @@
                     <u>{{data?.incidentNo}}</u>
                   </a>
                 </td>
-                <td class="char-list" popover={{data?.callContent}} triggers="mouseenter:mouseleave">
+                <td class="char-list" title={{data?.callContent}}>
                   {{data?.callContent | slice: 0:40 }}
                   <span *ngIf="data?.callContent?.length >= 40" >…</span>
                 </td>

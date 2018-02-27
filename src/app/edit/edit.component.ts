@@ -28,19 +28,23 @@ defineLocale('ja', jaLocale);
 })
 export class EditComponent implements OnInit {
   @ViewChild('sel_incidentType') sel_incidentType;
-  @ViewChild('txt_kijoNm') txt_kijoNm;
   @ViewChild('txt_setubiNm') txt_setubiNm;
   @ViewChild('txt_callContent') txt_callContent;
   @ViewChild('myForm') myForm;
   @ViewChild('errorModal') errorModal;
+  @ViewChild('fileList') fileList;
 
-  user;
+  userId;
+  userNm;
+  userSectionCd;
+  userSectionNm;
   subscription: Subscription;
   constructor(private route: ActivatedRoute, private jsonpService: JsonpService, private postService: PostService, private router: Router, private loginService: LoginService, private _localeService: BsLocaleService) {
     /* ログイン情報の取得 */
-    this.subscription = loginService.loginUser$.subscribe(
-      user => { this.user = user; }
-    );
+    this.subscription = loginService.loginUserNm$.subscribe(user => { this.userNm = user; });
+    this.subscription = loginService.loginUserId$.subscribe(user => { this.userId = user; });
+    this.subscription = loginService.loginUserSectionCd$.subscribe(user => { this.userSectionCd = user; });
+    this.subscription = loginService.loginUserSectionNm$.subscribe(user => { this.userSectionNm = user; });
     // datepikerの設定
     this.bsConfig = Object.assign({}, { dateInputFormat: 'YYYY/MM/DD' });
     this._localeService.use(this.locale);
@@ -69,8 +73,10 @@ export class EditComponent implements OnInit {
             // 画面表示パラメータのセット処理
             this.setDspParam(data.slice(1, -1)[0]);
 
-            // 関連リンク 障害対応報告書(MR2) 取得
-            this.findMr2List(this.incidentNo);
+            // 装置区分リストを表示
+            this.findSotiList();
+            // 機種区分リストを表示
+            this.findKisyuList()
           }
         }
         this.isLoading = false;
@@ -84,28 +90,8 @@ export class EditComponent implements OnInit {
       }
       );
 
-    // 画面表示パラメータ(関連インシデント)の取得処理
-    this.jsonpService.requestGet('RelateIncidentGet.php', ps)
-      .subscribe(
-      data => {
-        // 通信成功時
-        if (data[0]) {
-          let one = data[0];
-          let relateIncidentKijoId = data['relateIncidentKijiIdAry'];
-          let relateIncidentCustId = data['relateIncidentCustIdAry'];
-          if (one.result !== '' && one.result == true) {
-            // 画面表示パラメータのセット処理
-            this.setDspParamRelateIncident(relateIncidentKijoId, relateIncidentCustId);
-          }
-        }
-      },
-      error => {
-        // 通信失敗もしくは、コールバック関数内でエラー
-        console.log(error);
-        console.log('サーバとのアクセスに失敗しました。');
-        return false;
-      }
-      );
+    // ファイルリストを表示
+    this.fileList.openFileList(this.incidentId);
 
     // 初期化エラーメッセージを表示しない
     this.checkShowInit();
@@ -117,46 +103,36 @@ export class EditComponent implements OnInit {
     this.subscription.unsubscribe();
   }
 
+  /* 初期化処理 */
+  // 初期化エラーメッセージを表示しない
+  checkShowInit() {
+    this.checkDateShowincidentStartDate = false; //発生日時(日付型チェック)
+    this.checkDateShowCallDate = false; //受付日(日付型チェック)
+    this.checkRequireShowCallDate = false; //受付日(nullチェック)
+    this.checkDateShowTaioDate = false; //対応日(日付型チェック)
+    this.checkDateShowActDate = false; //処置予定日(日付型チェック)
+    this.checkDateShowActStartDate = false; //処置開始日時（日付）(日付型チェック)
+    this.checkDateShowActEndDate = false; //処置終了日時（日付）(日付型チェック)
+  }
+
+  // 初期化設定()
+  reset(keyword) {
+    switch (keyword) {
+      case "all":
+        // 初期化エラーメッセージを表示しない
+        this.checkShowInit();
+        break;
+      default:
+        break;
+    }
+  }
+
+  // 画面リロード対応
   reloadEdit($event) {
     this.checkShowInit(); // 初期化エラーメッセージを表示しない
     this.sel_incidentType.reset(); // インシデント分類CD
-    this.txt_kijoNm.reset(); // 機場
     this.txt_setubiNm.reset(); // 設備
     this.txt_callContent.reset(); // 受付内容
-  }
-
-  //MR2情報を取得する
-  findMr2List(incidentNo) {
-    let ps = new URLSearchParams();
-    if (incidentNo) {
-      ps.set('callNo', incidentNo);
-    }
-
-    // 画面表示パラメータの取得処理
-    this.isLoading = true;
-    this.jsonpService.requestGet('mr2ListDataGet.php', ps)
-      .subscribe(
-      data => {
-        // 通信成功時
-        console.log("受付番号成功");
-        console.log(data);
-        if (data[0]) {
-          if (data[0].result !== '' && data[0].result == true) {
-            // 画面表示パラメータのセット処理
-            let mr2Data = data.slice(1);
-            this.setMr2DspParam(mr2Data); // 配列1つ目は、サーバ処理成功フラグなので除外
-          }
-        }
-        this.isLoading = false;
-      },
-      error => {
-        // 通信失敗もしくは、コールバック関数内でエラー
-        console.log(error);
-        console.log('サーバとのアクセスに失敗しました。');
-        this.isLoading = false;
-        return false;
-      }
-      );
   }
 
   // 事業主体の初期化
@@ -165,88 +141,7 @@ export class EditComponent implements OnInit {
     this.jigyosyutaiNm = ""; //事業主体名
   }
 
-  //新しいウィンドウを開く(パターン1)
-  // CMN_openNewWindow1(url,name,sizex,sizey,top,left){
-  CMN_openNewWindow1(url, name, sizex, sizey) {
-    var style = "toolbar=0,location=0,directories=0,status=yes,menubar=0,scrollbars=1,resizable=1," +
-      "width=" + sizex + ",height=" + sizey;
-    // if( top ){
-    // 	style += ",top="+top;
-    // }  
-    // if( left ){
-    // 	style += ",left="+left;
-    // }
-    var win = window.open(url, name, style);
-    if (win) {
-      win.focus();
-      return win;
-    }
-  }
-
-  SUB_WIN = null;
-  // 関連MR2表示処理
-  showMr2(mkbid) {
-    if (this.SUB_WIN) this.SUB_WIN.close();
-    this.SUB_WIN = this.CMN_openNewWindow1("./#/mr2/" + mkbid, "sub_mr2", 1000, 760);
-  }
-
-  // 関連プロジェクト表示処理
-  showPj() {
-    if (this.SUB_WIN) this.SUB_WIN.close();
-    this.SUB_WIN = this.CMN_openNewWindow1("./#/project", "sub_project", 1000, 760);
-  }
-
-  // 関連事故クレーム情報表示処理
-  showJiko() {
-    if (this.SUB_WIN) this.SUB_WIN.close();
-    let url = environment.jikoPath + "jiko171211.html"; // 環境に合わせたURLを作成する TODO:固定値
-    this.SUB_WIN = this.CMN_openNewWindow1(url, "sub_jiko", 1200, 800);
-  }
-
-  // 関連費用決済申請表示処理 TODO:固定値表示
-  showHiyo(status, division, idno, bno, system_id, gougi_answer) {
-
-    if (system_id == "") {
-      system_id = "1282";
-    }
-
-    // var frm = window.document.fm1;
-    var strurl;
-
-    strurl = environment.hiyoPath + "wf_main_input.php";
-    strurl += "?user_id=ADF";
-    strurl += "&authority=9";
-    //	strurl += "&system_id=1282";
-    strurl += "&system_id=" + system_id;
-    strurl += "&status=" + status;
-    strurl += "&division=" + division;
-    strurl += "&idno=" + idno;
-    strurl += "&win_kbn=1";
-    if (gougi_answer) strurl += "&gougi_answer_mode=Y";
-
-    strurl += '&unit_flg=';
-    strurl += '&main_system_id=';
-    strurl += '&main_idno=';
-    strurl += '&param1=';
-    strurl += '&param2=';
-    strurl += '&param3=';
-    //	URLにBNOが含まれているかどうか？
-    if (bno != "") {
-      strurl = strurl.replace("BNO=&", "BNO=" + bno + "&");
-    }
-
-    this.SUB_WIN = this.CMN_openNewWindow1(strurl, "WF_EDIT", 1200, 800);
-    return;
-
-  }
-
-  // 関連インシデント表示処理
-  showRelateIncident(relateIncidentId) {
-    if (this.SUB_WIN) this.SUB_WIN.close();
-    this.SUB_WIN = this.CMN_openNewWindow1("./#/subDetail/" + relateIncidentId, "sub_detail", 1000, 760);
-  }
-
-// ::: 2018.02.02 [#35] 入力補助モーダル　取引先 Add Start newtouch
+  /* モーダルイベント処理 */
   // 顧客（取引先）
   onCustomerSearchSelected($event: any) {
     if ($event) {
@@ -254,7 +149,6 @@ export class EditComponent implements OnInit {
       this.custNm = $event["customerNm"]; // 顧客名
     }
   }
-// ::: 2018.02.02 [#35] 入力補助モーダル　取引先 Add End   newtouch
 
   // 親インシデント番号
   onIncidentSearchSelected($event: any) {
@@ -267,8 +161,7 @@ export class EditComponent implements OnInit {
   // プロジェクト選択
   onProjectSearchSelected($event: any) {
     if ($event) {
-      this.deliveryPjId = $event["pjId"]; //納入プロジェクトID
-      this.deliveryPjNm = $event["summaryNm"]; //納入プロジェクト名
+      this.deliveryPjNo = $event["pjNo"]; //納入プロジェクトNo
     }
   }
 
@@ -339,38 +232,29 @@ export class EditComponent implements OnInit {
     }
   }
 
-  // date pikerの設定
-  bsValue: Date;
-  locale = 'ja';
-  locales = listLocales();
-  bsConfig: Partial<BsDatepickerConfig>;
+  // 設備選択
+  onSetubiSelected($event: any) {
+    if ($event) {
+      this.setubiId = $event["setubiId"]; // 設備ID
+      this.setubiNm = $event["setubiNm"]; // 設備名
+      this.kijoId = $event["kijoId"]; // 機場ID
+      this.kijoNm = $event["kijoNm"]; // 機場名ID
+      this.jigyosyutaiId = $event["jigyosyutaiId"]; // 事業主体ID
+      this.jigyosyutaiNm = $event["jigyosyutaiNm"]; // 事業主体名
+      this.prefNm = $event["prefNm"]; // 都道府県
+    }
+  }
 
-  // 時間配列
-  timeList = [
-    { val: 0, label: "00" }, { val: 1, label: "01" }, { val: 2, label: "02" }, { val: 3, label: "03" }, { val: 4, label: "04" }, { val: 5, label: "05" }, { val: 6, label: "06" }, { val: 7, label: "07" }, { val: 8, label: "08" }, { val: 9, label: "09" }, { val: 10, label: "10" },
-    { val: 11, label: "11" }, { val: 12, label: "12" }, { val: 13, label: "13" }, { val: 14, label: "14" }, { val: 15, label: "15" }, { val: 16, label: "16" }, { val: 17, label: "17" }, { val: 18, label: "18" }, { val: 19, label: "19" }, { val: 20, label: "20" },
-    { val: 21, label: "21" }, { val: 22, label: "22" }, { val: 23, label: "23" },
-  ];
-  // 分配列
-  miniteList = [
-    { val: 0, label: "00" }, { val: 1, label: "01" }, { val: 2, label: "02" }, { val: 3, label: "03" }, { val: 4, label: "04" }, { val: 5, label: "05" }, { val: 6, label: "06" }, { val: 7, label: "07" }, { val: 8, label: "08" }, { val: 9, label: "09" }, { val: 10, label: "10" },
-    { val: 11, label: "11" }, { val: 12, label: "12" }, { val: 13, label: "13" }, { val: 14, label: "14" }, { val: 15, label: "15" }, { val: 16, label: "16" }, { val: 17, label: "17" }, { val: 18, label: "18" }, { val: 19, label: "19" }, { val: 20, label: "20" },
-    { val: 21, label: "21" }, { val: 22, label: "22" }, { val: 23, label: "23" }, { val: 24, label: "24" }, { val: 25, label: "25" }, { val: 26, label: "26" }, { val: 27, label: "27" }, { val: 28, label: "28" }, { val: 29, label: "29" }, { val: 30, label: "30" },
-    { val: 31, label: "31" }, { val: 32, label: "32" }, { val: 33, label: "33" }, { val: 34, label: "34" }, { val: 35, label: "35" }, { val: 36, label: "36" }, { val: 37, label: "37" }, { val: 38, label: "38" }, { val: 39, label: "39" }, { val: 40, label: "40" },
-    { val: 41, label: "41" }, { val: 42, label: "42" }, { val: 43, label: "43" }, { val: 44, label: "44" }, { val: 45, label: "45" }, { val: 46, label: "46" }, { val: 47, label: "47" }, { val: 48, label: "48" }, { val: 49, label: "49" }, { val: 50, label: "50" },
-    { val: 51, label: "51" }, { val: 52, label: "52" }, { val: 53, label: "53" }, { val: 54, label: "54" }, { val: 55, label: "55" }, { val: 56, label: "56" }, { val: 57, label: "57" }, { val: 58, label: "58" }, { val: 59, label: "59" },
-  ];
-
-  // 画面表示パラメータの初期化
+  /* 画面表示パラメータの初期化 */
   // １－１．ヘッダー
   incidentId = ""; // インシデントID
   incidentNo = ""; // インシデント番号
   incidentStatusCd = ""; // インシデントステータスCD
   incidentStatusNm = ""; // インシデントステータス名
   incidentTypeCd = ""; // インシデント分類CD
-  insDate: Date; // 登録日
+  insDate: Date = null; // 登録日
   insUserNm = ""; // 登録者
-  updDate: Date; // 更新日
+  updDate: Date = null; // 更新日
   updUserNm = ""; // 更新者
 
   // １－２．メイン情報
@@ -392,7 +276,6 @@ export class EditComponent implements OnInit {
   jigyosyutaiNm = ""; //事業主体名
   setubiId = ""; //設備ID
   setubiNm = ""; //設備名
-  prefId = ""; //都道府県ID
   prefNm = ""; //都道府県名
   custId = ""; //顧客ID 
   custNm = ""; //顧客名
@@ -402,8 +285,7 @@ export class EditComponent implements OnInit {
   salesDeptNm = ""; //営業部門名
   salesUserId = ""; //営業担当者ID
   salesUserNm = ""; //営業担当者名
-  deliveryPjId = ""; //納入プロジェクトID
-  deliveryPjNm = ""; //納入プロジェクト名
+  deliveryPjNo = ""; //納入プロジェクトNO
   custDept = ""; //会社名・所属部署
   requester = ""; //依頼者
   contactTel = ""; //連絡先(TEL)
@@ -461,8 +343,11 @@ export class EditComponent implements OnInit {
   actContent = ""; //処置内容
 
   // １－６．製品情報
-  productTypeCd = ""; //機種区分CD
-  productTypeNm = ""; //機種区分名
+  sotiKbnCd = ""; // 装置分類CD
+  sotiKbnNm = ""; // 装置分類名
+  kisyuKbnCd = ""; // 機種区分CD
+  kisyuKbnNm = ""; // 機種区分名
+  kisyuNm = ""; // 機種名  
   productTriggerCd = ""; //障害状況トリガーCD
   productTriggerNm = ""; //障害状況トリガー名
   productHindoCd = ""; //障害状況頻度CD
@@ -472,11 +357,7 @@ export class EditComponent implements OnInit {
   productStatusCd = ""; //障害状況状態CD
   productStatusNm = ""; //障害状況状態名
 
-  // 関連インシデント
-  relateIncidentKijoIdList = []; //同一機場インシデント
-  relateIncidentCustIdList = []; //同一顧客インシデント
-
-  // 画面表示パラメータのセット処理
+  /* 画面表示パラメータのセット処理 */
   setDspParam(data) {
     // １－１．ヘッダー
     this.incidentNo = data.incidentNo; // インシデント番号
@@ -507,7 +388,6 @@ export class EditComponent implements OnInit {
     this.jigyosyutaiNm = data.jigyosyutaiNm; //事業主体名
     this.setubiId = data.setubiId; //設備ID
     this.setubiNm = data.setubiNm; //設備名
-    this.prefId = data.prefId; //都道府県ID
     this.prefNm = data.prefNm; //都道府県名
     this.custId = data.custId; //顧客ID
     this.custNm = data.custNm; //顧客名
@@ -517,8 +397,7 @@ export class EditComponent implements OnInit {
     this.salesDeptNm = data.salesDeptNm; //営業部門名
     this.salesUserId = data.salesUserId; //営業担当者ID
     this.salesUserNm = data.salesUserNm; //営業担当者名
-    this.deliveryPjId = data.deliveryPjId; //納入プロジェクトID
-    this.deliveryPjNm = data.deliveryPjNm; //納入プロジェクト名
+    this.deliveryPjNo = data.deliveryPjNo; //納入プロジェクトNO
     this.custDept = data.custDept; //会社名・所属部署
     this.requester = data.requester; //依頼者
     this.contactTel = data.contactTel; //連絡先(TEL)
@@ -575,8 +454,11 @@ export class EditComponent implements OnInit {
     this.actContent = data.actContent; //処置内容
 
     // １－６．製品情報
-    this.productTypeCd = data.productTypeCd; //機種区分CD
-    this.productTypeNm = data.productTypeNm; //機種区分名
+    this.sotiKbnCd = data.sotiKbnCd; //装置分類CD
+    this.sotiKbnNm = data.sotiKbnNm; //装置分類名
+    this.kisyuKbnCd = data.kisyuKbnCd; //機種区分CD
+    this.kisyuKbnNm = data.kisyuKbnNm; //機種区分名
+    this.kisyuNm = data.kisyuNm; //機種名
     this.productTriggerCd = data.productTriggerCd; //障害状況トリガーCD
     this.productTriggerNm = data.productTriggerNm; //障害状況トリガー名
     this.productHindoCd = data.productHindoCd; //障害状況頻度CD
@@ -586,23 +468,468 @@ export class EditComponent implements OnInit {
     this.productStatusCd = data.productStatusCd; //障害状況状態CD
     this.productStatusNm = data.productStatusNm; //障害状況状態名
 
-    // ::: 2018.01.26 [#33] インシデント関係者の表示・追加・削除 Add Start newtouch
     this.initRelateUserList(data.relateUserList);
-    // ::: 2018.01.26 [#33] インシデント関係者の表示・追加・削除 Add End   newtouch
   }
 
-  // 障害対応報告(MR2)
-  MR2List = "" // MR2リスト
+  sotiList = [];
+  // 装置区分
+  findSotiList() {
+    // 画面表示パラメータの取得処理
+    this.jsonpService.requestGet('SotiKbnListGet.php', new URLSearchParams())
+      .subscribe(
+      data => {
+        // 通信成功時
+        if (data[0]) {
+          let one = data[0];
+          if (one.result !== '' && one.result == true) {
+            // 画面表示パラメータのセット処理
+            this.sotiList = data.slice(1);
+          }
+        }
+      },
+      error => {
+        // 通信失敗もしくは、コールバック関数内でエラー
+        console.log(error);
+        console.log('サーバとのアクセスに失敗しました。');
+        return false;
+      }
+      );
+  }
 
-  // 画面表示パラメータのセット処理
-  setMr2DspParam(data) {
-    this.MR2List = data;
+  kisyuList = [];
+  // 機種区分
+  findKisyuList() {
+    var ps = new URLSearchParams();
+    ps.set('sotiKbnCd', this.sotiKbnCd);
+    // 画面表示パラメータの取得処理
+    this.jsonpService.requestGet('KisyuKbnListGet.php', ps)
+      .subscribe(
+      data => {
+        // 通信成功時
+        if (data[0]) {
+          let one = data[0];
+          if (one.result !== '' && one.result == true) {
+            // 画面表示パラメータのセット処理
+            this.kisyuList = data.slice(1);
+          }
+        }
+      },
+      error => {
+        // 通信失敗もしくは、コールバック関数内でエラー
+        console.log(error);
+        console.log('サーバとのアクセスに失敗しました。');
+        return false;
+      }
+      );
   }
-  // 画面表示パラメータ(関連インシデント)のセット処理
-  setDspParamRelateIncident(relateIncidentKijoId, relateIncidentCustId) {
-    this.relateIncidentKijoIdList = relateIncidentKijoId;
-    this.relateIncidentCustIdList = relateIncidentCustId;
+
+  /* インシデント関係者処理 */
+  // インシデント関係者情報 
+  relateUserList = [];
+
+  // それが空であるかどうかを判断する
+  isEmpty(str: any) {
+    return str == null || str == undefined || str == "" ? true : false;
   }
+
+  // インシデント関係者 
+  initRelateUserList(relateUserArray: Array<any>) {
+    this.relateUserList = [];
+    let length = relateUserArray.length;
+    if (relateUserArray.length > 0) {
+      for (let i = 0; i < length; i++) {
+        let sectionObj = {};
+        let section = relateUserArray[i];
+        if (!this.isEmpty(section.relateUserSectionCd)) {
+          if (this.isDeptExist(section.relateUserSectionCd, section.relateUserSectionNm) != -1) {
+            continue;
+          }
+          sectionObj["relateUserSectionCd"] = section.relateUserSectionCd;
+          sectionObj["relateUserSectionNm"] = section.relateUserSectionNm;
+
+          let userList = [];
+
+          for (let j = 0; j < length; j++) {
+            let userObj = {};
+            let user = relateUserArray[j];
+            if (!this.isEmpty(user.relateUserId)) {
+              if (user.relateUserSectionCd == section.relateUserSectionCd && user.relateUserSectionNm == section.relateUserSectionNm) {
+                userObj["relateId"] = user.relateId;
+                userObj["relateUserId"] = user.relateUserId;
+                userObj["relateUserNm"] = user.relateUserNm;
+                userObj["kidokuDate"] = user.kidokuDate;
+                userList.push(userObj);
+              }
+            }
+          }
+
+          sectionObj["relateUsers"] = userList;
+          this.relateUserList.push(sectionObj);
+        }
+      }
+    }
+  }
+
+  // 部門が既に存在するかどうかを判断する
+  isDeptExist(targetCd: any, targetNm: any) {
+    var index = -1;
+    for (var i = 0; i < this.relateUserList.length; i++) {
+      var tmpCd = this.relateUserList[i].relateUserSectionCd.toString();
+      var tmpNm = this.relateUserList[i].relateUserSectionNm.toString();
+
+      if (tmpCd == targetCd.toString() && tmpNm == targetNm.toString()) {
+        index = i;
+      }
+    }
+    return index;
+  }
+
+  /* インシデント登録処理 */
+  onEntry(event, files: any) {
+    if (this.checkDate() && !this.myForm.invalid) {
+      console.log('登録処理スタート');
+
+      // インシデント登録処理
+      let ps = new URLSearchParams();
+      // ログイン情報設定
+      ps.set('userId', this.userId);
+      ps.set('userName', this.userNm);
+      ps.set('sectionCd', this.userSectionCd);
+      ps.set('sectionName', this.userSectionNm);
+      // インシデント情報
+      ps.set('incidentId', this.incidentId);
+      ps.set('incidentNo', this.incidentNo);
+      ps.set('incidentStatusCd', this.incidentStatusCd);
+      ps.set('incidentStatusNm', this.incidentStatusNm);
+      ps.set('incidentTypeCd', this.incidentTypeCd);
+      ps.set('insUserNm', this.insUserNm);
+      ps.set('updUserNm', this.updUserNm);
+      ps.set('parentIncidentId', this.parentIncidentId);
+      ps.set('parentIncidentNo', this.parentIncidentNo);
+      var incidentStartDateStr = this.getDateStringFromDateAndTime(this.incidentStartDate, this.incidentStartTime, this.incidentStartMinite);
+      ps.set('incidentStartDate', incidentStartDateStr);
+      ps.set('industryTypeCd', this.industryTypeCd);
+      ps.set('infoSourceCd', this.infoSourceCd);
+      ps.set('infoSourceNm', this.infoSourceNm);
+      ps.set('infoProvider', this.infoProvider);
+      ps.set('infoProvidedTel', this.infoProvidedTel);
+      ps.set('memo', this.memo);
+      ps.set('kijoId', this.kijoId);
+      ps.set('kijoNm', this.kijoNm);
+      ps.set('jigyosyutaiId', this.jigyosyutaiId);
+      ps.set('jigyosyutaiNm', this.jigyosyutaiNm);
+      ps.set('setubiId', this.setubiId);
+      ps.set('setubiNm', this.setubiNm);
+      ps.set('prefNm', this.prefNm);
+      ps.set('custId', this.custId);
+      ps.set('custNm', this.custNm);
+      ps.set('custTypeCd', this.custTypeCd);
+      ps.set('custTypeNm', this.custTypeNm);
+      ps.set('salesDeptCd', this.salesDeptCd);
+      ps.set('salesDeptNm', this.salesDeptNm);
+      ps.set('salesUserId', this.salesUserId);
+      ps.set('salesUserNm', this.salesUserNm);
+      ps.set('deliveryPjNo', this.deliveryPjNo);
+      ps.set('custDept', this.custDept);
+      ps.set('requester', this.requester);
+      ps.set('contactTel', this.contactTel);
+      ps.set('contactFax', this.contactFax);
+      ps.set('contactMail', this.contactMail);
+      ps.set('skanDeptCd', this.skanDeptCd);
+      ps.set('skanDeptNm', this.skanDeptNm);
+      ps.set('skanUserId', this.skanUserId);
+      ps.set('skanUserNm', this.skanUserNm);
+      ps.set('jigyosyutaiNm', this.jigyosyutaiNm);
+      ps.set('jigyosyutaiNm', this.jigyosyutaiNm);
+      ps.set('jigyosyutaiNm', this.jigyosyutaiNm);
+
+      var callStartDateStr = this.getDateStringFromDateAndTime(this.callDate, this.callStartTime, this.callStartMinite);
+      ps.set('callStartDate', callStartDateStr);
+      var callEndDateStr = this.getDateStringFromDateAndTime(this.callDate, this.callEndTime, this.callEndMinite);
+      ps.set('callEndDate', callEndDateStr);
+      ps.set('callDeptCd', this.callDeptCd);
+      ps.set('callDeptNm', this.callDeptNm);
+      ps.set('callUserId', this.callUserId);
+      ps.set('callUserNm', this.callUserNm);
+      ps.set('callTel', this.callTel);
+      ps.set('callMail', this.callMail);
+      ps.set('callContent', this.callContent);
+
+      var taioStartDateStr = this.getDateStringFromDateAndTime(this.taioDate, this.taioStartTime, this.taioStartMinite);
+      ps.set('taioStartDate', taioStartDateStr);
+      var taioEndDateStr = this.getDateStringFromDateAndTime(this.taioDate, this.taioEndTime, this.taioEndMinite);
+      ps.set('taioEndDate', taioEndDateStr);
+      ps.set('taioDeptCd', this.taioDeptCd);
+      ps.set('taioDeptNm', this.taioDeptNm);
+      ps.set('taioUserId', this.taioUserId);
+      ps.set('taioUserNm', this.taioUserNm);
+      ps.set('taioTel', this.taioTel);
+      ps.set('taioMail', this.taioMail);
+      ps.set('taioContent', this.taioContent);
+
+      var actDateStr = this.getDateStringFromDate(this.actDate);
+      ps.set('actDate', actDateStr);
+      ps.set('actTypeCd', this.actTypeCd);
+      var actStartDateStr = this.getDateStringFromDateAndTime(this.actStartDate, this.actStartTime, this.actStartMinite);
+      ps.set('actStartDate', actStartDateStr);
+      var actEndDateStr = this.getDateStringFromDateAndTime(this.actEndDate, this.actEndTime, this.actEndMinite);
+      ps.set('actEndDate', actEndDateStr);
+      ps.set('actDeptCd', this.actDeptCd);
+      ps.set('actDeptNm', this.actDeptNm);
+      ps.set('actUserId', this.actUserId);
+      ps.set('actUserNm', this.actUserNm);
+      ps.set('actTel', this.actTel);
+      ps.set('actMail', this.actMail);
+      ps.set('actContent', this.actContent);
+
+      ps.set('sotiKbnCd', this.sotiKbnCd);
+      var sotiKbnNm = "";
+      var tmpSotiKbnCd = this.sotiKbnCd
+      this.sotiList.forEach(function (sotiKbn) {
+        if (sotiKbn.sotiCd == tmpSotiKbnCd) {
+          sotiKbnNm = sotiKbn.sotiNm;
+        }
+      });
+      ps.set('sotiKbnNm', sotiKbnNm);
+      ps.set('kisyuKbnCd', this.kisyuKbnCd);
+      var kisyuKbnNm = "";
+      var tmpKisyuKbnCd = this.kisyuKbnCd
+      this.kisyuList.forEach(function (kisyuKbn) {
+        if (kisyuKbn.kisyuCd == tmpKisyuKbnCd) {
+          kisyuKbnNm = kisyuKbn.kisyuNm;
+        }
+      });
+      ps.set('kisyuKbnNm', kisyuKbnNm);
+      ps.set('kisyuNm', this.kisyuNm);
+      ps.set('productTriggerCd', this.productTriggerCd);
+      ps.set('productTriggerNm', this.productTriggerNm);
+      ps.set('productHindoCd', this.productHindoCd);
+      ps.set('productHindoNm', this.productHindoNm);
+      ps.set('productGensyoCd', this.productGensyoCd);
+      ps.set('productGensyoNm', this.productGensyoNm);
+      ps.set('productStatusCd', this.productStatusCd);
+      ps.set('productStatusNm', this.productStatusNm);
+
+      // 登録処理通信処理
+      this.isLoading = true;
+      this.jsonpService.requestGet('IncidentSave.php', ps)
+        .subscribe(
+        data => {
+          // 通信成功時
+          if (data[0]) {
+            let one = data[0];
+            if (one.result !== '' && one.result == true) {
+
+              if (!this.incidentId) {
+                // 新規登録の場合は、取得したIDを使う
+                this.incidentId = data.slice(1)[0].incidentId;
+              }
+
+              // ファイルアップロード
+              if (files) {
+                let data = new FormData();
+                for (var i = 0; i < files.length; i++) {
+                  let file = files[i];
+                  if (file) {
+                    data.append('incidentFile' + i, file, file.name);
+                  }
+                }
+                data.append('fileCount', files.length);
+                data.append('incidentId', this.incidentId);
+
+                let result = this.postService.requestPost('FileUpload.php', data);
+              }
+
+              // 画面遷移
+              this.router.navigate(['/common', 'インシデント情報を登録しました', '/detail/' + this.incidentId]);
+
+            }
+          }
+          this.isLoading = false;
+        },
+        error => {
+          // 通信失敗もしくは、コールバック関数内でエラー
+          console.log('サーバとのアクセスに失敗しました。');
+          this.isLoading = false;
+          return false;
+        }
+        );
+    } else {
+      this.sel_incidentType_require_error = this.sel_incidentType.hasError('required');
+      this.txt_setubiNm_require_error = this.txt_setubiNm.hasError('required');
+      this.txt_callContent_require_error = this.txt_callContent.hasError('required');
+
+      // 入力値にエラーが有る
+      this.errorModal.openModal('警告', '入力エラーがあります。', '', '閉じる');
+    }
+  }
+
+  sel_incidentType_require_error = false; // インシデント分類必須チェック
+  txt_setubiNm_require_error = false; // 設備名必須チェック
+  txt_callContent_require_error = false; // 受付内容必須チェック
+
+  // インシデント分類セレクト情報
+  incidentTypeArray = [
+    { label: '障害', value: 1 },
+    { label: '事故', value: 2 },
+    { label: 'クレーム', value: 3 },
+    { label: '問合せ', value: 4 },
+    { label: '情報', value: 5 },
+    { label: 'その他', value: 6 }
+  ];
+
+  // 業種区分セレクト情報
+  industryTypeArray = [
+    { label: '機械', value: 1 },
+    { label: '電機（E）', value: 2 },
+    { label: '計装（I）', value: 3 },
+    { label: '情報（C）', value: 4 },
+    { label: '環境', value: 5 },
+    { label: 'WBC', value: 6 },
+    { label: 'その他', value: 7 }
+  ];
+
+  // 都道府県セレクト情報
+  prefArray = [
+    { label: '北海道', value: '北海道' },
+    { label: '青森県', value: '青森県' },
+    { label: '岩手県', value: '岩手県' },
+    { label: '宮城県', value: '宮城県' },
+    { label: '秋田県', value: '秋田県' },
+    { label: '山形県', value: '山形県' },
+    { label: '福島県', value: '福島県' },
+    { label: '茨城県', value: '茨城県' },
+    { label: '栃木県', value: '栃木県' },
+    { label: '群馬県', value: '群馬県' },
+    { label: '埼玉県', value: '埼玉県' },
+    { label: '千葉県', value: '千葉県' },
+    { label: '東京都', value: '東京都' },
+    { label: '神奈川県', value: '神奈川県' },
+    { label: '新潟県', value: '新潟県' },
+    { label: '富山県', value: '富山県' },
+    { label: '石川県', value: '石川県' },
+    { label: '福井県', value: '福井県' },
+    { label: '山梨県', value: '山梨県' },
+    { label: '長野県', value: '長野県' },
+    { label: '岐阜県', value: '岐阜県' },
+    { label: '静岡県', value: '静岡県' },
+    { label: '愛知県', value: '愛知県' },
+    { label: '三重県', value: '三重県' },
+    { label: '滋賀県', value: '滋賀県' },
+    { label: '京都府', value: '京都府' },
+    { label: '大阪府', value: '大阪府' },
+    { label: '兵庫県', value: '兵庫県' },
+    { label: '奈良県', value: '奈良県' },
+    { label: '和歌山県', value: '和歌山県' },
+    { label: '鳥取県', value: '鳥取県' },
+    { label: '島根県', value: '島根県' },
+    { label: '岡山県', value: '岡山県' },
+    { label: '広島県', value: '広島県' },
+    { label: '山口県', value: '山口県' },
+    { label: '徳島県', value: '徳島県' },
+    { label: '香川県', value: '香川県' },
+    { label: '愛媛県', value: '愛媛県' },
+    { label: '高知県', value: '高知県' },
+    { label: '福岡県', value: '福岡県' },
+    { label: '佐賀県', value: '佐賀県' },
+    { label: '長崎県', value: '長崎県' },
+    { label: '熊本県', value: '熊本県' },
+    { label: '大分県', value: '大分県' },
+    { label: '宮崎県', value: '宮崎県' },
+    { label: '鹿児島県', value: '鹿児島県' },
+    { label: '沖縄県', value: '沖縄県' },
+  ];
+
+  // 顧客分類セレクト情報
+  custTypeArray = [
+    { label: '年間契約', value: 1 },
+    { label: '点検契約', value: 2 },
+    { label: '契約なし', value: 3 },
+    { label: '瑕疵期間中', value: 4 },
+    { label: 'その他', value: 5 },
+  ];
+
+  // 情報提供元セレクト情報
+  infoSourceArray = [
+    { label: '顧客', value: 1 },
+    { label: '特約店', value: 2 },
+    { label: '営業', value: 3 },
+    { label: '技術', value: 4 },
+    { label: 'その他', value: 5 },
+  ];
+
+  // 機種区分セレクト情報
+  productTypeArray = [
+    { label: '機種区分１', value: 1 },
+    { label: 'etc', value: 2 },
+  ];
+
+  // 障害状況トリガーセレクト情報
+  productTriggerArray = [
+    { label: '通常運用', value: 1 },
+    { label: '立上時', value: 2 },
+    { label: '立下時', value: 3 },
+    { label: '停電', value: 4 },
+    { label: '復電', value: 5 },
+    { label: 'etc', value: 6 },
+  ];
+
+  // 障害状況頻度セレクト情報
+  productHindoArray = [
+    { label: '常時', value: 1 },
+    { label: '不定期', value: 2 },
+    { label: '間欠的', value: 3 },
+    { label: 'その他', value: 4 },
+    { label: 'etc', value: 5 },
+  ];
+
+  // 障害状況現象セレクト情報
+  productGensyoArray = [
+    { label: '運転不能', value: 1 },
+    { label: '停止不能', value: 2 },
+    { label: '動作異常', value: 3 },
+    { label: '操作不能', value: 4 },
+    { label: 'etc', value: 5 },
+  ];
+
+  // 障害状況状態セレクト情報
+  productStatusArray = [
+    { label: 'システムダウン', value: 1 },
+    { label: '電源断', value: 2 },
+    { label: '機器・装置故障', value: 2 },
+    { label: '部品故障', value: 2 },
+    { label: 'etc', value: 2 },
+  ];
+
+  // 処置区分セレクト情報
+  actTypeArray = [
+    { label: '出動', value: 1 },
+    { label: '電話対応', value: 2 },
+    { label: 'その他', value: 3 },
+  ];
+
+  /* 日付処理 */
+  // date pikerの設定
+  bsValue: Date;
+  locale = 'ja';
+  locales = listLocales();
+  bsConfig: Partial<BsDatepickerConfig>;
+
+  // 時間配列
+  timeList = [
+    { val: 0, label: "00" }, { val: 1, label: "01" }, { val: 2, label: "02" }, { val: 3, label: "03" }, { val: 4, label: "04" }, { val: 5, label: "05" }, { val: 6, label: "06" }, { val: 7, label: "07" }, { val: 8, label: "08" }, { val: 9, label: "09" }, { val: 10, label: "10" },
+    { val: 11, label: "11" }, { val: 12, label: "12" }, { val: 13, label: "13" }, { val: 14, label: "14" }, { val: 15, label: "15" }, { val: 16, label: "16" }, { val: 17, label: "17" }, { val: 18, label: "18" }, { val: 19, label: "19" }, { val: 20, label: "20" },
+    { val: 21, label: "21" }, { val: 22, label: "22" }, { val: 23, label: "23" },
+  ];
+  // 分配列
+  miniteList = [
+    { val: 0, label: "00" }, { val: 1, label: "01" }, { val: 2, label: "02" }, { val: 3, label: "03" }, { val: 4, label: "04" }, { val: 5, label: "05" }, { val: 6, label: "06" }, { val: 7, label: "07" }, { val: 8, label: "08" }, { val: 9, label: "09" }, { val: 10, label: "10" },
+    { val: 11, label: "11" }, { val: 12, label: "12" }, { val: 13, label: "13" }, { val: 14, label: "14" }, { val: 15, label: "15" }, { val: 16, label: "16" }, { val: 17, label: "17" }, { val: 18, label: "18" }, { val: 19, label: "19" }, { val: 20, label: "20" },
+    { val: 21, label: "21" }, { val: 22, label: "22" }, { val: 23, label: "23" }, { val: 24, label: "24" }, { val: 25, label: "25" }, { val: 26, label: "26" }, { val: 27, label: "27" }, { val: 28, label: "28" }, { val: 29, label: "29" }, { val: 30, label: "30" },
+    { val: 31, label: "31" }, { val: 32, label: "32" }, { val: 33, label: "33" }, { val: 34, label: "34" }, { val: 35, label: "35" }, { val: 36, label: "36" }, { val: 37, label: "37" }, { val: 38, label: "38" }, { val: 39, label: "39" }, { val: 40, label: "40" },
+    { val: 41, label: "41" }, { val: 42, label: "42" }, { val: 43, label: "43" }, { val: 44, label: "44" }, { val: 45, label: "45" }, { val: 46, label: "46" }, { val: 47, label: "47" }, { val: 48, label: "48" }, { val: 49, label: "49" }, { val: 50, label: "50" },
+    { val: 51, label: "51" }, { val: 52, label: "52" }, { val: 53, label: "53" }, { val: 54, label: "54" }, { val: 55, label: "55" }, { val: 56, label: "56" }, { val: 57, label: "57" }, { val: 58, label: "58" }, { val: 59, label: "59" },
+  ];
 
   checkDateShowincidentStartDate = false; //発生日時(日付型チェック)
   checkDateShowCallDate = false; //受付日(日付型チェック)
@@ -675,175 +1002,6 @@ export class EditComponent implements OnInit {
     return result;
   }
 
-  // 初期化エラーメッセージを表示しない
-  checkShowInit() {
-    this.checkDateShowincidentStartDate = false; //発生日時(日付型チェック)
-    this.checkDateShowCallDate = false; //受付日(日付型チェック)
-    this.checkRequireShowCallDate = false; //受付日(nullチェック)
-    this.checkDateShowTaioDate = false; //対応日(日付型チェック)
-    this.checkDateShowActDate = false; //処置予定日(日付型チェック)
-    this.checkDateShowActStartDate = false; //処置開始日時（日付）(日付型チェック)
-    this.checkDateShowActEndDate = false; //処置終了日時（日付）(日付型チェック)
-  }
-
-  // インシデント登録処理
-  onEntry(event, files: any) {
-    if (this.checkDate() && !this.myForm.invalid) {
-      console.log('登録処理スタート');
-
-      // // 画面表示パラメータの取得処理
-      let ps = new URLSearchParams();
-      ps.set('incidentId', this.incidentId);
-      ps.set('incidentNo', this.incidentNo);
-      ps.set('incidentStatusCd', this.incidentStatusCd);
-      ps.set('incidentStatusNm', this.incidentStatusNm);
-      ps.set('incidentTypeCd', this.incidentTypeCd);
-      // ps.set('insDate', this.insDate);
-      ps.set('insUserNm', this.insUserNm);
-      // ps.set('updDate', this.updDate);
-      ps.set('updUserNm', this.updUserNm);
-      ps.set('parentIncidentId', this.parentIncidentId);
-      ps.set('parentIncidentNo', this.parentIncidentNo);
-      var incidentStartDateStr = this.getDateStringFromDateAndTime(this.incidentStartDate, this.incidentStartTime, this.incidentStartMinite);
-      ps.set('incidentStartDate', incidentStartDateStr);
-      ps.set('industryTypeCd', this.industryTypeCd);
-      ps.set('infoSourceCd', this.infoSourceCd);
-      ps.set('infoSourceNm', this.infoSourceNm);
-      ps.set('infoProvider', this.infoProvider);
-      ps.set('infoProvidedTel', this.infoProvidedTel);
-      ps.set('memo', this.memo);
-      ps.set('kijoId', this.kijoId);
-      ps.set('kijoNm', this.kijoNm);
-      ps.set('jigyosyutaiId', this.jigyosyutaiId);
-      ps.set('jigyosyutaiNm', this.jigyosyutaiNm);
-      ps.set('setubiId', this.setubiId);
-      ps.set('setubiNm', this.setubiNm);
-      ps.set('prefId', this.prefId);
-      ps.set('prefNm', this.prefNm);
-      ps.set('custId', this.custId);
-      ps.set('custNm', this.custNm);
-      ps.set('custTypeCd', this.custTypeCd);
-      ps.set('custTypeNm', this.custTypeNm);
-      ps.set('salesDeptCd', this.salesDeptCd);
-      ps.set('salesDeptNm', this.salesDeptNm);
-      ps.set('salesUserId', this.salesUserId);
-      ps.set('salesUserNm', this.salesUserNm);
-      ps.set('deliveryPjId', this.deliveryPjId);
-      ps.set('deliveryPjNm', this.deliveryPjNm);
-      ps.set('custDept', this.custDept);
-      ps.set('requester', this.requester);
-      ps.set('contactTel', this.contactTel);
-      ps.set('contactFax', this.contactFax);
-      ps.set('contactMail', this.contactMail);
-      ps.set('skanDeptCd', this.skanDeptCd);
-      ps.set('skanDeptNm', this.skanDeptNm);
-      ps.set('skanUserId', this.skanUserId);
-      ps.set('skanUserNm', this.skanUserNm);
-      ps.set('jigyosyutaiNm', this.jigyosyutaiNm);
-      ps.set('jigyosyutaiNm', this.jigyosyutaiNm);
-      ps.set('jigyosyutaiNm', this.jigyosyutaiNm);
-
-      var callStartDateStr = this.getDateStringFromDateAndTime(this.callDate, this.callStartTime, this.callStartMinite);
-      ps.set('callStartDate', callStartDateStr);
-      var callEndDateStr = this.getDateStringFromDateAndTime(this.callDate, this.callEndTime, this.callEndMinite);
-      ps.set('callEndDate', callEndDateStr);
-      ps.set('callDeptCd', this.callDeptCd);
-      ps.set('callDeptNm', this.callDeptNm);
-      ps.set('callUserId', this.callUserId);
-      ps.set('callUserNm', this.callUserNm);
-      ps.set('callTel', this.callTel);
-      ps.set('callMail', this.callMail);
-      ps.set('callContent', this.callContent);
-
-      var taioStartDateStr = this.getDateStringFromDateAndTime(this.taioDate, this.taioStartTime, this.taioStartMinite);
-      ps.set('taioStartDate', taioStartDateStr);
-      var taioEndDateStr = this.getDateStringFromDateAndTime(this.taioDate, this.taioEndTime, this.taioEndMinite);
-      ps.set('taioEndDate', taioEndDateStr);
-      ps.set('taioDeptCd', this.taioDeptCd);
-      ps.set('taioDeptNm', this.taioDeptNm);
-      ps.set('taioUserId', this.taioUserId);
-      ps.set('taioUserNm', this.taioUserNm);
-      ps.set('taioTel', this.taioTel);
-      ps.set('taioMail', this.taioMail);
-      ps.set('taioContent', this.taioContent);
-
-      var actDateStr = this.getDateStringFromDate(this.actDate);
-      ps.set('actDate', actDateStr);
-      ps.set('actTypeCd', this.actTypeCd);
-      var actStartDateStr = this.getDateStringFromDateAndTime(this.actStartDate, this.actStartTime, this.actStartMinite);
-      ps.set('actStartDate', actStartDateStr);
-      var actEndDateStr = this.getDateStringFromDateAndTime(this.actEndDate, this.actEndTime, this.actEndMinite);
-      ps.set('actEndDate', actEndDateStr);
-      ps.set('actDeptCd', this.actDeptCd);
-      ps.set('actDeptNm', this.actDeptNm);
-      ps.set('actUserId', this.actUserId);
-      ps.set('actUserNm', this.actUserNm);
-      ps.set('actTel', this.actTel);
-      ps.set('actMail', this.actMail);
-      ps.set('actContent', this.actContent);
-
-      ps.set('productTypeCd', this.productTypeCd);
-      ps.set('productTypeNm', this.productTypeNm);
-      ps.set('productTriggerCd', this.productTriggerCd);
-      ps.set('productTriggerNm', this.productTriggerNm);
-      ps.set('productHindoCd', this.productHindoCd);
-      ps.set('productHindoNm', this.productHindoNm);
-      ps.set('productGensyoCd', this.productGensyoCd);
-      ps.set('productGensyoNm', this.productGensyoNm);
-      ps.set('productStatusCd', this.productStatusCd);
-      ps.set('productStatusNm', this.productStatusNm);
-
-      // 登録処理通信処理
-      this.isLoading = true;
-      this.jsonpService.requestGet('IncidentEntry.php', ps)
-        .subscribe(
-        data => {
-          // 通信成功時
-          console.log(data);
-          if (data[0]) {
-            let one = data[0];
-            if (one.result !== '' && one.result == true) {
-
-              if (!this.incidentId) {
-                // 新規登録の場合は、取得したIDを使う
-                this.incidentId = data.slice(1)[0].incidentId;
-              }
-
-              // ファイルアップロード
-              if (files) {
-                let file = files[0]; // TODO 1件のみ対応
-                if (file) {
-                  let data = new FormData();
-                  data.append('incidentFile', file, file.name);
-                  data.append('incidentId', this.incidentId);
-
-                  let result = this.postService.requestPost('FileUpload.php', data);
-                  console.log(result);
-                }
-
-              }
-
-              // 画面遷移
-              this.router.navigate(['/common', 'インシデント情報を登録しました', '/detail/' + this.incidentId]);
-
-            }
-          }
-          this.isLoading = false;
-        },
-        error => {
-          // 通信失敗もしくは、コールバック関数内でエラー
-          console.log(error);
-          console.log('サーバとのアクセスに失敗しました。');
-          this.isLoading = false;
-          return false;
-        }
-        );
-    } else {
-      // 入力値にエラーが有る
-      this.errorModal.openModal('警告', '入力エラーがあります。', '', '閉じる');
-    }
-  }
-
   // サーバから取得した日付をJavascriptのDate型に変更する（失敗時は、nullを返す）
   getJsDate(date) {
     if (date && new Date(date)) {
@@ -869,7 +1027,7 @@ export class EditComponent implements OnInit {
         var dStr = ('00' + d).slice(-2);
       }
       if (yStr && mStr && dStr) {
-        return yStr + "-" + mStr + "-" + dStr + " 00:00:00";
+        return yStr + "/" + mStr + "/" + dStr + " 00:00:00";
       } else {
         // 日付型でない値の場合
         return null;
@@ -928,7 +1086,7 @@ export class EditComponent implements OnInit {
         miniteStr = ('00' + minite).slice(-2);
       }
       if (yStr && mStr && dStr && timeStr && miniteStr) {
-        return yStr + "-" + mStr + "-" + dStr + " " + timeStr + ":" + miniteStr + ":00";
+        return yStr + "/" + mStr + "/" + dStr + " " + timeStr + ":" + miniteStr + ":00";
       } else {
         // 日付型でない値の場合
         return null;
@@ -940,218 +1098,4 @@ export class EditComponent implements OnInit {
     }
   }
 
-  // インシデント分類セレクト情報
-  incidentTypeArray = [
-    { label: '障害', value: 1 },
-    { label: '事故', value: 2 },
-    { label: 'クレーム', value: 3 },
-    { label: '問合せ', value: 4 },
-    { label: '情報', value: 5 },
-    { label: 'その他', value: 6 }
-  ];
-
-  // 業種区分セレクト情報
-  industryTypeArray = [
-    { label: '機械', value: 1 },
-    { label: '電機（E）', value: 2 },
-    { label: '計装（I）', value: 3 },
-    { label: '情報（C）', value: 4 },
-    { label: '環境', value: 5 },
-    { label: 'WBC', value: 6 },
-    { label: 'その他', value: 7 }
-  ];
-
-  // 都道府県セレクト情報
-  prefArray = [
-    { label: '北海道', value: 1 },
-    { label: '青森県', value: 2 },
-    { label: '岩手県', value: 3 },
-    { label: '宮城県', value: 4 },
-    { label: '秋田県', value: 5 },
-    { label: '山形県', value: 6 },
-    { label: '福島県', value: 7 },
-    { label: '茨城県', value: 8 },
-    { label: '栃木県', value: 9 },
-    { label: '群馬県', value: 10 },
-    { label: '埼玉県', value: 11 },
-    { label: '千葉県', value: 12 },
-    { label: '東京都', value: 13 },
-    { label: '神奈川県', value: 14 },
-    { label: '新潟県', value: 15 },
-    { label: '富山県', value: 16 },
-    { label: '石川県', value: 17 },
-    { label: '福井県', value: 18 },
-    { label: '山梨県', value: 19 },
-    { label: '長野県', value: 20 },
-    { label: '岐阜県', value: 21 },
-    { label: '静岡県', value: 22 },
-    { label: '愛知県', value: 23 },
-    { label: '三重県', value: 24 },
-    { label: '滋賀県', value: 25 },
-    { label: '京都府', value: 26 },
-    { label: '大阪府', value: 27 },
-    { label: '兵庫県', value: 28 },
-    { label: '奈良県', value: 29 },
-    { label: '和歌山県', value: 30 },
-    { label: '鳥取県', value: 31 },
-    { label: '島根県', value: 32 },
-    { label: '岡山県', value: 33 },
-    { label: '広島県', value: 34 },
-    { label: '山口県', value: 35 },
-    { label: '徳島県', value: 36 },
-    { label: '香川県', value: 37 },
-    { label: '愛媛県', value: 38 },
-    { label: '高知県', value: 39 },
-    { label: '福岡県', value: 40 },
-    { label: '佐賀県', value: 41 },
-    { label: '長崎県', value: 42 },
-    { label: '熊本県', value: 43 },
-    { label: '大分県', value: 44 },
-    { label: '宮崎県', value: 45 },
-    { label: '鹿児島県', value: 46 },
-    { label: '沖縄県', value: 47 },
-  ];
-
-  // 顧客分類セレクト情報
-  custTypeArray = [
-    { label: '年間契約', value: 1 },
-    { label: '点検契約', value: 2 },
-    { label: '契約なし', value: 3 },
-    { label: '瑕疵期間中', value: 4 },
-    { label: 'その他', value: 5 },
-  ];
-
-  // 情報提供元セレクト情報
-  infoSourceArray = [
-    { label: '顧客', value: 1 },
-    { label: '特約店', value: 2 },
-    { label: '営業', value: 3 },
-    { label: '技術', value: 4 },
-    { label: 'その他', value: 5 },
-  ];
-
-  // 機種区分セレクト情報
-  productTypeArray = [
-    { label: '機種区分１', value: 1 },
-    { label: 'etc', value: 2 },
-  ];
-
-  // 障害状況トリガーセレクト情報
-  productTriggerArray = [
-    { label: '通常運用', value: 1 },
-    { label: '立上時', value: 2 },
-    { label: '立下時', value: 3 },
-    { label: '停電', value: 4 },
-    { label: '復電', value: 5 },
-    { label: 'etc', value: 6 },
-  ];
-
-  // 障害状況頻度セレクト情報
-  productHindoArray = [
-    { label: '常時', value: 1 },
-    { label: '不定期', value: 2 },
-    { label: '間欠的', value: 3 },
-    { label: 'その他', value: 4 },
-    { label: 'etc', value: 5 },
-  ];
-
-  // 障害状況現象セレクト情報
-  productGensyoArray = [
-    { label: '運転不能', value: 1 },
-    { label: '停止不能', value: 2 },
-    { label: '動作異常', value: 3 },
-    { label: '操作不能', value: 4 },
-    { label: 'etc', value: 5 },
-  ];
-
-  // 障害状況状態セレクト情報
-  productStatusArray = [
-    { label: 'システムダウン', value: 1 },
-    { label: '電源断', value: 2 },
-    { label: '機器・装置故障', value: 2 },
-    { label: '部品故障', value: 2 },
-    { label: 'etc', value: 2 },
-  ];
-
-  // 処置区分セレクト情報
-  actTypeArray = [
-    { label: '出動', value: 1 },
-    { label: '電話対応', value: 2 },
-    { label: 'その他', value: 3 },
-  ];
-
-  // ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add Start newtouch
-
-  // インシデント情報 
-  relateUserList = [];
-
-  // それが空であるかどうかを判断する
-  isEmpty(str: any) {
-    return str == null || str == undefined || str == "" ? true : false;
-  }
-
-  // インシデント関係者 
-  initRelateUserList(relateUserArray: Array<any>) {
-    this.relateUserList = [];
-    let length = relateUserArray.length;
-    if (relateUserArray.length > 0) {
-      for (let i = 0; i < length; i++) {
-        let sectionObj = {};
-        let section = relateUserArray[i];
-        if (!this.isEmpty(section.relateUserSectionCd)) {
-          if (this.isDeptExist(section.relateUserSectionCd, section.relateUserSectionNm) != -1) {
-            continue;
-          }
-          sectionObj["relateUserSectionCd"] = section.relateUserSectionCd;
-          sectionObj["relateUserSectionNm"] = section.relateUserSectionNm;
-
-          let userList = [];
-
-          for (let j = 0; j < length; j++) {
-            let userObj = {};
-            let user = relateUserArray[j];
-            if (!this.isEmpty(user.relateUserId)) {
-              if (user.relateUserSectionCd == section.relateUserSectionCd && user.relateUserSectionNm == section.relateUserSectionNm) {
-                userObj["relateId"] = user.relateId;
-                userObj["relateUserId"] = user.relateUserId;
-                userObj["relateUserNm"] = user.relateUserNm;
-                userObj["kidokuDate"] = user.kidokuDate;
-                userList.push(userObj);
-              }
-            }
-          }
-
-          sectionObj["relateUsers"] = userList;
-          this.relateUserList.push(sectionObj);
-        }
-      }
-    }
-  }
-
-  // 部門が既に存在するかどうかを判断する
-  isDeptExist(targetCd: any, targetNm: any) {
-    var index = -1;
-    for (var i = 0; i < this.relateUserList.length; i++) {
-      var tmpCd = this.relateUserList[i].relateUserSectionCd.toString();
-      var tmpNm = this.relateUserList[i].relateUserSectionNm.toString();
-
-      if (tmpCd == targetCd.toString() && tmpNm == targetNm.toString()) {
-        index = i;
-      }
-    }
-    return index;
-  }
-  // ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add End   newtouch
-
-  // 初期化設定()
-  reset(keyword) {
-    switch (keyword) {
-      case "all":
-        // 初期化エラーメッセージを表示しない
-        this.checkShowInit();
-        break;
-      default:
-        break;
-    }
-  }
 }
