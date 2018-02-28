@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { URLSearchParams } from '@angular/http';
 
@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
   styleUrls: ['./file.component.css']
 })
 export class FileComponent implements OnInit {
+  @ViewChild('errorModal') errorModal;
 
   userId;
   userNm;
@@ -29,12 +30,14 @@ export class FileComponent implements OnInit {
 
   ngOnInit() { }
 
-  openFileList(incidentId: string) {
+  incidentId = "";
+  deleteShow = false;
+
+  openFileList(incidentId: string, deleteFlg: boolean) {
     this.incidentId = incidentId;
+    this.deleteShow = deleteFlg;
     this.findFileList();
   }
-
-  incidentId = "";
 
   findFileList() {
     let ps = new URLSearchParams();
@@ -64,6 +67,32 @@ export class FileComponent implements OnInit {
       );
   }
 
+  // ファイルの有無を確認して、ダウンロードする
+  fileCheck(fileId: any) {
+    let ps = new URLSearchParams();
+    ps.set('fileId', fileId);
+
+    // 検索
+    this.jsonpService.requestGet('FileCheck.php', ps)
+      .subscribe(
+      data => {
+        // 通信成功時 
+        if (data[0]['result'] == true) {
+          // ファイルが有る場合は、ダウンロードする
+          this.fileDownload(fileId);
+        } else if (data[0]['result'] == false) {
+          // ファイルが無い場合は、メッセージを表示する
+          this.errorModal.openModal('警告', 'ファイルが削除されています。', '', '閉じる');
+        }
+      },
+      error => {
+        // 通信失敗もしくは、コールバック関数内でエラー
+        console.log(error);
+        console.log('サーバとのアクセスに失敗しました。');
+        return false;
+      }
+      );
+  }
 
   fileList = [];
   /* 画面表示パラメータのセット処理 */
@@ -78,32 +107,9 @@ export class FileComponent implements OnInit {
   }
 
   fileDownload(fileId: any) {
-
-    let data = new FormData();
-    data.append('fileId', fileId);
-
-    let result = this.postService.requestPost('FileDl.php', data);
-
-    // let ps = new URLSearchParams();
-    // ps.set('fileId', fileId);
-
-    // // 検索
-    // this.jsonpService.requestGet('FileDl.php', ps)
-    //   .subscribe(
-    //   data => {
-    //     console.log(data);
-    //     // if (data[0]['result'] == true) {
-    //     //   // 通信成功時 
-    //     //   this.findFileList();
-    //     // }
-    //   },
-    //   error => {
-    //     // 通信失敗もしくは、コールバック関数内でエラー
-    //     console.log(error);
-    //     // console.log('サーバとのアクセスに失敗しました。');
-    //     // return false;
-    //   }
-    //   );
+    if (fileId) {
+      window.location.replace("/INCIDENT/FileDl.php?fileId=" + fileId);
+    }
   }
 
   fileDelete() {

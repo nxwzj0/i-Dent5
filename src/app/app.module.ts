@@ -11,7 +11,8 @@ import { BsDatepickerModule } from 'ngx-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap';
 
 import { AppComponent } from './app.component';
-import { ErrorComponent } from './error.component';
+import { ErrorComponent } from './error/error.component';
+import { ErrorHandlerComponent } from './errorHandler/errorHandler.component';
 import { HeaderComponent } from './header/header.component';
 import { TopComponent } from './top/top.component';
 import { ListComponent } from './list/list.component';
@@ -48,6 +49,7 @@ import { DatexPipe } from './pipe/datex.pipe';
   declarations: [
     AppComponent,
     ErrorComponent,
+    ErrorHandlerComponent,
     HeaderComponent,
     TopComponent,
     ListComponent,

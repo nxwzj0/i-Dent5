@@ -76,7 +76,7 @@ export class EditComponent implements OnInit {
             // 装置区分リストを表示
             this.findSotiList();
             // 機種区分リストを表示
-            this.findKisyuList()
+            this.findKisyuList();
           }
         }
         this.isLoading = false;
@@ -91,7 +91,7 @@ export class EditComponent implements OnInit {
       );
 
     // ファイルリストを表示
-    this.fileList.openFileList(this.incidentId);
+    this.fileList.openFileList(this.incidentId, true);
 
     // 初期化エラーメッセージを表示しない
     this.checkShowInit();
@@ -523,6 +523,10 @@ export class EditComponent implements OnInit {
       );
   }
 
+  initKisyuKbnCd() {
+    this.kisyuKbnCd = "";
+  }
+
   /* インシデント関係者処理 */
   // インシデント関係者情報 
   relateUserList = [];
@@ -858,12 +862,6 @@ export class EditComponent implements OnInit {
     { label: 'その他', value: 5 },
   ];
 
-  // 機種区分セレクト情報
-  productTypeArray = [
-    { label: '機種区分１', value: 1 },
-    { label: 'etc', value: 2 },
-  ];
-
   // 障害状況トリガーセレクト情報
   productTriggerArray = [
     { label: '通常運用', value: 1 },
@@ -871,7 +869,15 @@ export class EditComponent implements OnInit {
     { label: '立下時', value: 3 },
     { label: '停電', value: 4 },
     { label: '復電', value: 5 },
-    { label: 'etc', value: 6 },
+    { label: '対象機器状変', value: 6 },
+    { label: '他設備機器状変', value: 7 },
+    { label: 'モード切替', value: 8 },
+    { label: '二重化切替', value: 9 },
+    { label: '雷害', value: 10 },
+    { label: '水害', value: 11 },
+    { label: '火災', value: 12 },
+    { label: 'VVVF運転時', value: 13 },
+    { label: 'その他', value: 14 },
   ];
 
   // 障害状況頻度セレクト情報
@@ -880,7 +886,6 @@ export class EditComponent implements OnInit {
     { label: '不定期', value: 2 },
     { label: '間欠的', value: 3 },
     { label: 'その他', value: 4 },
-    { label: 'etc', value: 5 },
   ];
 
   // 障害状況現象セレクト情報
@@ -889,16 +894,27 @@ export class EditComponent implements OnInit {
     { label: '停止不能', value: 2 },
     { label: '動作異常', value: 3 },
     { label: '操作不能', value: 4 },
-    { label: 'etc', value: 5 },
+    { label: '監視不能', value: 5 },
+    { label: '入出力値', value: 6 },
+    { label: '異常異音・異臭', value: 7 },
+    { label: '過熱', value: 8 },
+    { label: '磨耗', value: 9 },
+    { label: '詰まり', value: 10 },
+    { label: '回転不良', value: 11 },
+    { label: '伝送・回線異常', value: 12 },
+    { label: '異常停止', value: 13 },
+    { label: '錆・腐食', value: 14 },
+    { label: 'その他', value: 15 },
   ];
 
   // 障害状況状態セレクト情報
   productStatusArray = [
     { label: 'システムダウン', value: 1 },
     { label: '電源断', value: 2 },
-    { label: '機器・装置故障', value: 2 },
-    { label: '部品故障', value: 2 },
-    { label: 'etc', value: 2 },
+    { label: '機器・装置故障', value: 3 },
+    { label: '部品故障', value: 4 },
+    { label: '破損・焼損', value: 5 },
+    { label: 'その他', value: 6 }
   ];
 
   // 処置区分セレクト情報

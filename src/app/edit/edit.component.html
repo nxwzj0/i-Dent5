@@ -935,7 +935,7 @@
                     </label>
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                    <select name="sel_sotiKbnCd" class="form-control edit-dropdown" [(ngModel)]="sotiKbnCd" (change)="findKisyuList()">
+                    <select name="sel_sotiKbnCd" class="form-control edit-dropdown" [(ngModel)]="sotiKbnCd" (change)="initKisyuKbnCd();findKisyuList()">
                       <option value=""></option>
                       <option *ngFor="let item of sotiList" [value]='item.sotiCd'>
                         {{item.sotiNm}}
@@ -1033,36 +1033,38 @@
         </div>
         <!-- /.panel -->
 
-        <h4 class="panel-header text-primary">
-          <strong>▼関係者</strong>
-        </h4>
-        <div class="panel panel-default">
-          <div class="panel-body context-margin">
-            <h5 class="context-header">
-              <strong>
-                <i class="fa fa-dot-circle-o" aria-hidden="true"></i> 変更を通知する／
-                <i class="fa fa-circle-o" aria-hidden="true"></i> 変更を通知しない
-              </strong>
-            </h5>
-            <div class="context-margin">
-              <!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add Start newtouch -->
-              <ul *ngFor="let dept of relateUserList;let deptIdx = index;" style="list-style:none;padding-left: 0px;">
-                <div>{{dept.relateUserSectionNm}}</div>
-                <li *ngFor="let user of dept.relateUsers;let userIdx = index;">
-                  <div style="width:235px;display: inline-block;">
-                    <span class="context-margin relate-user-nm">
-                      {{user.relateUserNm}}
-                      <span *ngIf="user.kidokuDate != ''">（既読日：{{user.kidokuDate}}）</span>
-                    </span>
-                  </div>
-                </li>
-              </ul>
-              <!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add End   newtouch -->
+        <span *ngIf="incidentId != null">
+          <h4 class="panel-header text-primary">
+            <strong>▼関係者</strong>
+          </h4>
+          <div class="panel panel-default">
+            <div class="panel-body context-margin">
+              <h5 class="context-header">
+                <strong>
+                  <i class="fa fa-dot-circle-o" aria-hidden="true"></i> 変更を通知する／
+                  <i class="fa fa-circle-o" aria-hidden="true"></i> 変更を通知しない
+                </strong>
+              </h5>
+              <div class="context-margin">
+                <!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add Start newtouch -->
+                <ul *ngFor="let dept of relateUserList;let deptIdx = index;" style="list-style:none;padding-left: 0px;">
+                  <div>{{dept.relateUserSectionNm}}</div>
+                  <li *ngFor="let user of dept.relateUsers;let userIdx = index;">
+                    <div style="width:235px;display: inline-block;">
+                      <span class="context-margin relate-user-nm">
+                        {{user.relateUserNm}}
+                        <span *ngIf="user.kidokuDate != ''">（既読日：{{user.kidokuDate}}）</span>
+                      </span>
+                    </div>
+                  </li>
+                </ul>
+                <!-- ::: 2018.01.30 [#33] インシデント関係者の表示・追加・削除 Add End   newtouch -->
+              </div>
             </div>
+            <!-- /.panel-body -->
           </div>
-          <!-- /.panel-body -->
-        </div>
-        <!-- /.panel -->
+          <!-- /.panel -->
+        </span>
 
       </div>
     </div>

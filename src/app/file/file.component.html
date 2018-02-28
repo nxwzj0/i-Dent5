@@ -8,14 +8,17 @@
 //*****************************************************************************
 -->
 <common-modal #fileCommon (commonEnter)="fileDelete()"></common-modal>
+<common-modal #errorModal (commonClose)="findFileList()"></common-modal>
 <div class="row">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <div *ngFor="let data of fileList">
       <div>
-        <a (click)="fileDownload(data?.fileId)">
-          <u>{{data?.fileNm}}</u>
+        <a (click)="fileCheck(data?.fileId)">
+          <u>
+            <i class="fa fa-file"></i>&nbsp;{{data?.fsvrNm}}</u>
         </a>
-        <button type="button" class="btn btn-sx-ori btn-danger btn-close" (click)="setDeleteFileId(data?.fileId);fileCommon.openModal('確認','ファイルを削除します。宜しいですか？','OK','キャンセル')">
+        &nbsp;
+        <button type="button" class="btn btn-sx-ori btn-danger btn-close" *ngIf="deleteShow" (click)="setDeleteFileId(data?.fileId);fileCommon.openModal('確認','ファイルを削除します。宜しいですか？','OK','キャンセル')">
           <i class="fa fa-trash"></i>
         </button>
       </div>

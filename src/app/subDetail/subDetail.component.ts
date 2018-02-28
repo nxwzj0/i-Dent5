@@ -17,6 +17,7 @@ import { LoadingComponent } from "../loading/loading.component";
 })
 export class SubDetailComponent implements OnInit {
   @ViewChild('relateUser') relateUser;
+  @ViewChild('fileList') fileList;
 
   userId;
   userNm;
@@ -103,6 +104,9 @@ export class SubDetailComponent implements OnInit {
         return false;
       }
       );
+
+    // ファイルリストを表示
+    this.fileList.openFileList(prmIncientId, false);
 
   }
 

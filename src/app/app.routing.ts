@@ -1,7 +1,8 @@
 import { ModuleWithProviders }   from '@angular/core';
 import { Routes, RouterModule }   from '@angular/router';
 
-import { ErrorComponent } from './error.component';
+import { ErrorComponent } from './error/error.component';
+import { ErrorHandlerComponent } from './errorHandler/errorHandler.component';
 import { TopComponent } from './top/top.component';
 import { ListComponent } from './list/list.component';
 import { DetailComponent } from './detail/detail.component';
@@ -23,6 +24,8 @@ const myRoutes = [
   { path: 'top', component: TopComponent, data: { category:'top'}},
   { path: 'project', component: ProjectComponent, data: { category:'project'}},
   { path: 'mr2/:mkbId', component: Mr2Component, data: { category:'mr2'}},
+  { path: 'errorHandler/:errorCd', component: ErrorHandlerComponent, data: { category:'errorHandler'}},
+  { path: 'errorHandler', component: ErrorHandlerComponent, data: { category:'errorHandler'}},
   { path: '', component: TopComponent, data: { category:'top'}},
   { path: '**', component: ErrorComponent },
 ];

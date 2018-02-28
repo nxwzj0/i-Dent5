@@ -76,6 +76,11 @@ export class ProjectSearchModalComponent {
     this.searchSummaryNm = "";
   }
 
+  // 表示ページを初期化する
+  initCurrentPage() {
+    this.currentPage = 1;
+  }
+
   // 検索処理
   search() {
     // 検索パラメータの作成

@@ -81,20 +81,9 @@
                 <strong>添付ファイル：</strong>
               </div>
               <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">
-                <!-- {{incidentFileNm}} -->
+                <file-component #fileList></file-component>
               </div>
             </div>
-            <!-- <div class="row">
-              <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
-                <strong>関係者：</strong>
-              </div>
-              <div class="col-lg-9 col-md-9 col-sm-6 col-xs-6">
-                <span *ngFor="let relateUser of relateList; last as last;">
-                  {{relateUser.name}}
-                  <span>{{ !last ? ',' : '' }}</span>
-                </span>
-              </div>
-            </div> -->
             <div class="row">
               <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
                 <strong>注記：</strong>

@@ -38,11 +38,11 @@
                 <th class="table-header relate-th" popover="関連プロジェクト" triggers="mouseenter:mouseleave">関連PJ</th>
                 <th class="table-header relate-th" popover="事故クレーム連絡" triggers="mouseenter:mouseleave">事ク連絡</th>
                 <th class="table-header relate-th" popover="現地出動（MR2）" triggers="mouseenter:mouseleave">現地出動</th>
-                <th class="table-header relate-th">費用決済</th>
+                <th class="table-header relate-th">費用決裁</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let data of incidentList">
+              <tr *ngFor="let data of incidentList | slice: 0:20 ">
                 <td class="code-list">
                   <a routerLink="/detail/{{data?.incidentId}}" routerLinkActive="current" [routerLinkActiveOptions]="{ exact: true }">
                     <u>{{data?.incidentNo}}</u>
