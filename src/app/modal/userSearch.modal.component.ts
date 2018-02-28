@@ -45,10 +45,19 @@ export class UserSearchModalComponent {
   
   // ページング処理
   pageChanged(event: any): void {
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add Start newtouch
+    if (!(this.itemsPerPage > 0)) {
+      this.itemsPerPage = 10;
+    }
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add End   newtouch
     this.start = this.itemsPerPage * (this.currentPage - 1);
     let tmpStart: number = +this.start;
     let tmpItemsPerPage: number = +this.itemsPerPage;
     this.end = tmpStart + tmpItemsPerPage;
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add Start newtouch
+    this.search();
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add End   newtouch
+
   }
 
   // モーダル表示
@@ -58,9 +67,23 @@ export class UserSearchModalComponent {
       this.modalType = modalTypeFromParent;
     }
     this.clearUserSearch();
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add Start newtouch
+    this.bigTotalItems = 0; // 総数
+    this.itemsPerPage = 10; // 1ページに表示する件数
+    this.currentPage = 0;
+    this.start = 0;
+    this.end = 10;
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add End   newtouch
     this.search();
     this.template.show();
   }
+
+  // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add Start newtouch
+  // 表示ページを初期化する
+  initCurrentPage() {
+    this.currentPage = 1;
+  }
+  // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add End   newtouch
 
   // 検索条件の初期化
   clearUserSearch() {
@@ -78,6 +101,10 @@ export class UserSearchModalComponent {
     ps.set("userNmMei", this.searchUserFirstNm);
     ps.set("sectionNm", this.searchSectionNm);
     ps.set("sectionCd", this.searchSectionCd);
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add Start newtouch
+    ps.set("pagingStart", (this.start + 1).toString());
+    ps.set("pagingEnd", this.itemsPerPage.toString());
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add End   newtouch
 
     // 検索
     this.isLoading = true;
@@ -90,11 +117,16 @@ export class UserSearchModalComponent {
           let list = data[0];
           if (list.result !== '' && list.result == true) {
             // 画面表示パラメータのセット処理
+            // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add Start newtouch
+            this.bigTotalItems = list.count; // ページング(総数)
+            // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Add End   newtouch
             this.setDspParam(data.slice(1)); // 配列1つ目は、サーバ処理成功フラグなので除外
           }
         }
-        this.currentPage = 1;
-        this.pageChanged(null);
+        // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Del Start newtouch
+        // :::         this.currentPage = 1;
+        // :::         this.pageChanged(null);
+        // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Del End   newtouch
         this.isLoading = false;
       },
       error => {
@@ -111,8 +143,10 @@ export class UserSearchModalComponent {
   userList = [];
   // 画面表示パラメータのセット処理
   setDspParam(data) {
-    // ページングの設定
-    this.bigTotalItems = data.length;
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Del Start newtouch
+    // :::     // ページングの設定
+    // :::     this.bigTotalItems = data.length;
+    // ::: 2018.02.28 [#42] ページング修正：ユーザモーダル Del End   newtouch
     // ユーザリストをセット
     this.userList = data;
   }
