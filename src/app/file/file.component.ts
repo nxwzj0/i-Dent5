@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { URLSearchParams } from '@angular/http';
+import { environment } from '../../environments/environment';
 
 import { JsonpService } from '../jsonp.service';
 import { PostService } from '../post.service';
@@ -108,7 +109,11 @@ export class FileComponent implements OnInit {
 
   fileDownload(fileId: any) {
     if (fileId) {
-      window.location.replace("/INCIDENT/FileDl.php?fileId=" + fileId);
+      // basic form で submit
+      var myForm = <HTMLFormElement>document.getElementById('frm');
+      myForm.dlFileId.value = fileId;
+      myForm.action = environment.envPath + "FileDl.php";
+      myForm.submit();
     }
   }
 

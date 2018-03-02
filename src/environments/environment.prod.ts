@@ -1,8 +1,9 @@
 export const environment = {
   production: true,
   location: 'server',
-  envPath: '../', // TODO: httpから始まるフルパスにする
-  envCommonPath: '../../COMMONAPI/', // TODO: httpから始まるフルパスにする
-  jikoPath: '../../JIKO/', // TODO: httpから始まるフルパスにする
-  hiyoPath: '../..//WORKFLOW/', // TODO: httpから始まるフルパスにする
+  envPath: 'http://bnaviu.metawater.co.jp/INCIDENT/',
+  envCommonPath: 'http://bnaviu.metawater.co.jp/COMMONAPI/',
+  jikoPath: 'http://bnaviu.metawater.co.jp/JIKO/',
+  hiyoPath: 'http://bnaviu.metawater.co.jp/WORKFLOW/',
+  crmPath: 'http://arcs-mcrm24.metawater.co.jp/CALL/php/',
 };

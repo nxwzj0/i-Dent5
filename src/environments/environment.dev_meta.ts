@@ -1,8 +1,9 @@
 export const environment = {
   production: true,
   location: 'server',
-  envPath: '../', // TODO: httpから始まるフルパスにする
-  envCommonPath: '../../COMMONAPI/', // TODO: httpから始まるフルパスにする
-  jikoPath: '../../JIKO/', // TODO: httpから始まるフルパスにする
-  hiyoPath: '../..//WORKFLOW/', // TODO: httpから始まるフルパスにする
+  envPath: 'http://10.197.26.3/INCIDENT/',
+  envCommonPath: 'http://10.197.26.3/COMMONAPI/',
+  jikoPath: 'http://10.197.26.3/JIKO/',
+  hiyoPath: 'http://10.197.26.3/WORKFLOW/',
+  crmPath: 'http://yjkecr01.metawater.co.jp/CALL/php/',
 };
